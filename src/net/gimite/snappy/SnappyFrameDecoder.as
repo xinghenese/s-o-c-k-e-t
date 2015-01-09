@@ -6,9 +6,9 @@ package net.gimite.snappy
 	 */
 	public class SnappyFrameDecoder
 	{		
-		private static const SNAPPY:ByteArray;// = ['s', 'N', 'a', 'P', 'p', 'Y' ];
+		private static const SNAPPY:ByteArray = new ByteArray();// = ['s', 'N', 'a', 'P', 'p', 'Y' ];
 	    private const snappy:Snappy = new Snappy();
-	    private const validateChecksums:Boolean;
+	    private var validateChecksums:Boolean;
 	    private var started:Boolean;
 	    private var corrupted:Boolean;
 	
@@ -31,14 +31,15 @@ package net.gimite.snappy
 	     * @throws Exception
 	     *             if error occurred while decoding.
 	     */
-	    public function decode():ByteArray// throws Exception
+	    public function decode(_in:ByteArray, _out:Array):ByteArray// throws Exception
 	    {
-			if(arguments[0] is ByteArray){
-				return decodeBytes(arguments[0]);
-			}
-			else if(arguments[0] is InputByteBuffer && arguments[1] is OutputByteBuffer)
+			if(arguments.length == 1)
 			{
-				decodeByteBuffer(arguments[0], arguments[1]);
+				return decodeBytes(_in);
+			}
+			else if(arguments.length == 2)
+			{
+				decodeByteBuffer(InputByteBuffer(_in), _out);
 			}
 	    }
 		
@@ -51,7 +52,7 @@ package net.gimite.snappy
 			{
 				var outSize:int = _out.length;
 				var oldInputLength:int = _in.bytesAvailable;
-				decodeByteBuffer(_in, _out);
+				decodeByteBuffer(InputByteBuffer(_in), _out);
 				
 				if(outSize == _out.length)
 				{
@@ -123,7 +124,7 @@ package net.gimite.snappy
 //	        return buf.getBytes();
 		}
 	
-	    protected function decodeByteBuffer(_in:InputByteBuffer, _out:Array):void	//List<ByteArray> to Array// throws Exception
+	    protected function decodeByteBuffer(_in:InputByteBuffer, _out:Array):ByteArray	//List<ByteArray> to Array// throws Exception
 	    {
 	        if (corrupted)
 	        {
@@ -143,7 +144,7 @@ package net.gimite.snappy
 	                return;
 	            }
 	
-	            const chunkTypeVal:uint = _in.getUnsignedByte(pos);
+	            const chunkTypeVal:uint = _in.readUnsignedByte();
 	            const chunkType:ChunkType = mapChunkType(byte(chunkTypeVal));
 	            const chunkLength:int = Bytes.swapMedium(_in.getUnsignedMedium(pos + 1));
 	

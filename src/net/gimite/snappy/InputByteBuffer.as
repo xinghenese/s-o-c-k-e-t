@@ -7,8 +7,7 @@ package net.gimite.snappy
 	 */
 	public class InputByteBuffer extends ByteArray
 	{		
-	    private static const EMPTY_BUFFER:InputByteBuffer = new InputByteBuffer(new ByteArray()); //java:new byte[0]. In AS, constructor ByteArray could not take arugments
-	    private const buf:ByteArray;
+	    private static const EMPTY_BUFFER:InputByteBuffer = new InputByteBuffer(); //java:new byte[0]. In AS, constructor ByteArray could not take arugments
 	    private var index:int = 0;
 	    private var markerIndex:int = 0;
 	
@@ -17,39 +16,41 @@ package net.gimite.snappy
 	        super();
 	    }
 	
-		//to Modify
-	    public function array():ByteArray
-	    {
-	        return buf;
-	    }
-	
-	    public function getByte(offset:int):int //byte to int
-	    {
-	        checkIndex(offset, 1);
-	        return buf[offset]; //should return buf[offset] & 0xFF?
-	    }
-	
 	    public function getIndex():int
 	    {
 	        return this.position;
 	    }
 	
-	    public function getInt(offset:int):int
+	    public function getByte(offset:int = position):int //byte to int
 	    {
-	        checkIndex(offset, 4);
-	        return (buf[offset] & 0xff) << 24 | (buf[offset + 1] & 0xff) << 16 | (buf[offset + 2] & 0xff) << 8
-	                | buf[offset + 3] & 0xff;
+			return getData(1, offset);
 	    }
 	
-	    public function getUnsignedByte(offset:int):int //short to int
+	    public function getInt(offset:int = position):int
 	    {
-	        return int(getByte(offset) & 0xFF);
+	        return getData(4, offset);
 	    }
 	
-	    public function getUnsignedMedium(offset:int):int
+	    public function getUnsignedByte(offset:int = position):uint //short to int
 	    {
-	        return (buf[offset] & 0xff) << 16 | (buf[offset + 1] & 0xff) << 8 | buf[offset + 2] & 0xff;
+	        return uint(getByte(offset) & 0xFF);
 	    }
+	
+	    public function getUnsignedMedium(offset:int = position):int
+	    {
+	        return getData(3, offset);
+	    }
+		
+		private function getData(size:int, offset:int = position):int
+		{
+			checkIndex(offset, size);
+			for(var i:int = 0, data:int = 0, bit:int = 8; i < size; i++)
+			{
+				data |= (super.readByte() & 0xff) << (bit * (size - 1 - i));
+			}
+			position -= size;
+			return data;			
+		}
 	
 	    public function isReadable():Boolean
 	    {
@@ -58,49 +59,12 @@ package net.gimite.snappy
 	
 	    public function length():int
 	    {
-	        return buf.length;
+	        return length;
 	    }
 	
 	    public function markIndex():void
 	    {
 	        markerIndex = index;
-	    }
-	
-	    public function readByte(advance:Boolean = false):int //byte to int
-	    {
-//	        checkReadableBytes(1);
-//	        return buf[index++]; //should return buf[index++] & 0xFF?
-			var _data = super.readByte();
-			if(advance)
-			{
-				position --;
-			}
-			return _data;
-	    }
-	
-	    override public function readBytes(bytes:ByteArray):void//:InputByteBuffer
-	    {
-//	        checkReadableBytes(bytes.length);
-//	        System.arraycopy(buf, index, bytes, 0, bytes.length); //Array.prototype.slice in AS acts as if System.arraycopy in Java
-//	        setIndex(index + bytes.length);
-//	        return this;
-			super.readBytes(bytes, 0, bytes.length);
-	    }
-	
-	    public function readInt():int
-	    {
-	        checkReadableBytes(4);
-	        var result:int = getInt(index);
-	        index += 4;
-	        return result;
-	    }
-	
-	    public function readShort():int //short to int
-	    {
-	        checkReadableBytes(2);
-	        var result:int =  int(buf[index] << 8 | buf[index + 1] & 0xFF); //short to int
-	        index += 2;
-	        return result;
 	    }
 	
 	    public function readSlice(length:int):InputByteBuffer
@@ -109,54 +73,47 @@ package net.gimite.snappy
 	        {
 	            return EMPTY_BUFFER;
 	        }
-	        if (index + length > buf.length)
+	        if (bytesAvailable < length)
 	        {
-	            throw new IndexOutOfBoundsException();
-	        }
-	
-	        var result:InputByteBuffer = new InputByteBuffer(Array.prototype.slice.call(buf, index, index + length)); //Array.prototype.slice in AS acts as if Arrays.copyOfRange in Java
-	        index += length;
-	        return result;
-	    }
-	
-	    public function readUnsignedByte():int //short to int
-	    {
-	        return int(readByte() & 0xFF);
+	            throw new RangeError();
+	        }	
+//	        var result:InputByteBuffer = Array.prototype.slice.call(this, position, position = position + length); //Array.prototype.slice in AS acts as if Arrays.copyOfRange in Java
+//	        return result;
+			return InputByteBuffer(Array.prototype.slice.call(this, position, position = position + length));
 	    }
 	
 	    public function readUnsignedMedium():int
 	    {
-	        checkReadableBytes(3);
-	        var result:int = (buf[index] & 0xff) << 16 | (buf[index + 1] & 0xff) << 8 | buf[index + 2] & 0xff;
-	        index += 3;
-	        return result;
+	        var data = getData(3);
+			position += 3;
+	        return data;
 	    }
 	
 	    public function readableBytes():int
 	    {
-	        return buf.length - index;
+	        return bytesAvailable;
 	    }
 	
 	    public function resetIndex():void
 	    {
-	        index = markerIndex;
+	        position = markerIndex;
 	    }
 	
 	    public function setIndex(value:int):void
 	    {
-	        this.index = value;
+	        position = value;
 	    }
 	
 	    public function skipBytes(length:int):InputByteBuffer
 	    {
 	        checkReadableBytes(length);
-	        setIndex(index + length);
+	        position += length;
 	        return this;
 	    }
 	
 	    private function checkIndex(offset:int, length:int):void
 	    {
-	        if (offset + length > buf.length)
+	        if (offset + length > super.length)
 	        {
 	            throw new EOFError();
 	        }

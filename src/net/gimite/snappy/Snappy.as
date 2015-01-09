@@ -20,7 +20,7 @@ package net.gimite.snappy
 	    private static const COPY_2_BYTE_OFFSET:int = 2;
 	    private static const COPY_4_BYTE_OFFSET:int = 3;
 	
-	    private var state:int = State.READY;
+	    private var state:State = State.READY;
 	    private var tag:int; //byte to int
 	    private var written:int;
 	
@@ -785,13 +785,13 @@ package net.gimite.snappy
 	        }
 	    }
 		
-		private final class State
-		{
-			public static const READY:int = 0;
-			public static const READING_PREAMBLE:int = 1;
-			public static const READING_TAG:int = 2;
-			public static const READING_LITERAL:int = 3;
-			public static const READING_COPY:int = 4;
-		}
+//		private final class State
+//		{
+//			public static const READY:int = 0;
+//			public static const READING_PREAMBLE:int = 1;
+//			public static const READING_TAG:int = 2;
+//			public static const READING_LITERAL:int = 3;
+//			public static const READING_COPY:int = 4;
+//		}
 	}
 }
