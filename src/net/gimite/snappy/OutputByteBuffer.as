@@ -6,7 +6,6 @@ package net.gimite.snappy
 	 */
 	public class OutputByteBuffer extends ByteArray
 	{
-		private static const DEFAULT_CAPACITY:int = 256;
 //	    private var buf:ByteArray;
 //	    private var index:int;
 	
@@ -15,9 +14,10 @@ package net.gimite.snappy
 //	        this(DEFAULT_CAPACITY);
 //	    }
 
-		public function OutputByteBuffer():void
+		public function OutputByteBuffer(length:int = 256):void
 		{
 			super();
+			this.length = length;
 		}
 	
 //	    public function OutputByteBuffer(capacity:int = DEFAULT_CAPACITY)	//overload with default arguments assignment

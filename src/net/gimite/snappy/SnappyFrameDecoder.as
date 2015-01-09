@@ -31,32 +31,32 @@ package net.gimite.snappy
 	     * @throws Exception
 	     *             if error occurred while decoding.
 	     */
-	    public function decode(_in:ByteArray, _out:Array):ByteArray// throws Exception
+	    public function decode(bytesIn:ByteArray, bytesOut:Array):ByteArray// throws Exception
 	    {
 			if(arguments.length == 1)
 			{
-				return decodeBytes(_in);
+				return decodeBytes(bytesIn);
 			}
 			else if(arguments.length == 2)
 			{
-				decodeByteBuffer(InputByteBuffer(_in), _out);
+				decodeByteBuffer(InputByteBuffer(bytesIn), bytesOut);
 			}
 	    }
 		
 		protected function decodeBytes(bytes:ByteArray):ByteArray
 		{
-			var _in:ByteArray = bytes;
-			var _out:Array = new Array();
+			var bytesIn:ByteArray = bytes;
+			var bytesOut:Array = new Array();
 			
-			while(_in.bytesAvailable)
+			while(bytesIn.bytesAvailable)
 			{
-				var outSize:int = _out.length;
-				var oldInputLength:int = _in.bytesAvailable;
-				decodeByteBuffer(InputByteBuffer(_in), _out);
+				var outSize:int = bytesOut.length;
+				var oldInputLength:int = bytesIn.bytesAvailable;
+				decodeByteBuffer(InputByteBuffer(bytesIn), bytesOut);
 				
-				if(outSize == _out.length)
+				if(outSize == bytesOut.length)
 				{
-					if(oldInputLength == _in.bytesAvailable)
+					if(oldInputLength == bytesIn.bytesAvailable)
 					{
 						break;
 					}
@@ -65,36 +65,36 @@ package net.gimite.snappy
 					}
 				}
 				
-				if(oldInputLength == _in.bytesAvailable)
+				if(oldInputLength == bytesIn.bytesAvailable)
 				{
 					throw new SnappyException();
 				}
 			}
 			
 			var len:int = 0;
-			for (var _each:ByteArray in _out)
+			for (var _each:ByteArray in bytesOut)
 	        {
 	            len += _each.length;
 	        }
 	        var buf:OutputByteBuffer = new OutputByteBuffer(len);
-	        for (_each in _out)
+	        for (_each in bytesOut)
 	        {
 	            buf.writeBytes(_each);
 	        }
 	        return buf.getBytes();
 			
-//			var _in:InputByteBuffer = new InputByteBuffer(bytes);
-//	        var _out:List<ByteArray> = new ArrayList<ByteArray>();
-//			var _out:Array = new Array();	//List<ByteArray> to Array
-//	        while (_in.isReadable())
+//			var bytesIn:InputByteBuffer = new InputByteBuffer(bytes);
+//	        var bytesOut:List<ByteArray> = new ArrayList<ByteArray>();
+//			var bytesOut:Array = new Array();	//List<ByteArray> to Array
+//	        while (bytesIn.isReadable())
 //	        {
-//	            var outSize:int = _out.size();
-//	            var oldInputLength:int = _in.readableBytes();
-//	            decodeByteBuffer(_in, _out);
+//	            var outSize:int = bytesOut.size();
+//	            var oldInputLength:int = bytesIn.readableBytes();
+//	            decodeByteBuffer(bytesIn, bytesOut);
 //	
-//	            if (outSize == _out.size())
+//	            if (outSize == bytesOut.size())
 //	            {
-//	                if (oldInputLength == _in.readableBytes())
+//	                if (oldInputLength == bytesIn.readableBytes())
 //	                {
 //	                    break;
 //	                }
@@ -104,7 +104,7 @@ package net.gimite.snappy
 //	                }
 //	            }
 //	
-//	            if (oldInputLength == _in.readableBytes())
+//	            if (oldInputLength == bytesIn.readableBytes())
 //	            {
 //	                throw new SnappyException(".decode() did not read anything but decoded a message.");
 //	            }
@@ -112,30 +112,30 @@ package net.gimite.snappy
 //	
 //	        // we calculate the total bytes to avoid multiple memory allocation.
 //	        var len:int = 0;
-//	        for (var _each:ByteArray in _out)
+//	        for (var _each:ByteArray in bytesOut)
 //	        {
 //	            len += _each.length;
 //	        }
 //	        var buf:OutputByteBuffer = new OutputByteBuffer(len);
-//	        for (_each in _out)
+//	        for (_each in bytesOut)
 //	        {
 //	            buf.writeBytes(_each);
 //	        }
 //	        return buf.getBytes();
 		}
 	
-	    protected function decodeByteBuffer(_in:InputByteBuffer, _out:Array):ByteArray	//List<ByteArray> to Array// throws Exception
+	    protected function decodeByteBuffer(bytesIn:InputByteBuffer, bytesOut:Array):ByteArray	//List<ByteArray> to Array// throws Exception
 	    {
 	        if (corrupted)
 	        {
-	            _in.skipBytes(_in.readableBytes());
+	            bytesIn.skipBytes(bytesIn.readableBytes());
 	            return;
 	        }
 	
 	        try
 	        {
-	            var pos:int = _in.position;
-	            const inSize:int = _in.bytesAvailable;
+	            var pos:int = bytesIn.position;
+	            const inSize:int = bytesIn.bytesAvailable;
 	            if (inSize < 4)
 	            {
 	                // We need to be at least able to read the chunk type identifier
@@ -144,9 +144,9 @@ package net.gimite.snappy
 	                return;
 	            }
 	
-	            const chunkTypeVal:uint = _in.readUnsignedByte();
+	            const chunkTypeVal:uint = bytesIn.readUnsignedByte();
 	            const chunkType:ChunkType = mapChunkType(byte(chunkTypeVal));
-	            const chunkLength:int = Bytes.swapMedium(_in.getUnsignedMedium(pos + 1));
+	            const chunkLength:int = Bytes.swapMedium(bytesIn.getUnsignedMedium(pos + 1));
 	
 	            switch (chunkType)
 	            {
@@ -162,7 +162,7 @@ package net.gimite.snappy
 	                    }
 	
 	                    var identifier:ByteArray = new byte[chunkLength];
-	                    _in.skipBytes(4).readBytes(identifier);
+	                    bytesIn.skipBytes(4).readBytes(identifier);
 	
 	                    if (!Arrays.equals(identifier, SNAPPY))
 	                    {
@@ -184,7 +184,7 @@ package net.gimite.snappy
 	                        return;
 	                    }
 	
-	                    _in.skipBytes(4 + chunkLength);
+	                    bytesIn.skipBytes(4 + chunkLength);
 	                    break;
 	                case ChunkType.RESERVED_UNSKIPPABLE:
 	                    // The spec mandates that reserved unskippable chunks must
@@ -209,17 +209,17 @@ package net.gimite.snappy
 	                        return;
 	                    }
 	
-	                    _in.skipBytes(4);
+	                    bytesIn.skipBytes(4);
 	                    if (validateChecksums)
 	                    {
-	                        var checksum:int = Bytes.swapInt(_in.readInt());
-	                        Snappy.validateChecksum(checksum, _in, _in.getIndex(), chunkLength - 4);
+	                        var checksum:int = Bytes.swapInt(bytesIn.readInt());
+	                        Snappy.validateChecksum(checksum, bytesIn, bytesIn.getIndex(), chunkLength - 4);
 	                    }
 	                    else
 	                    {
-	                        _in.skipBytes(4);
+	                        bytesIn.skipBytes(4);
 	                    }
-	                    _out.add(_in.readSlice(chunkLength - 4).array());
+	                    bytesOut.add(bytesIn.readSlice(chunkLength - 4).array());
 	                    break;
 	                case ChunkType.COMPRESSED_DATA:
 	                    if (!started)
@@ -232,16 +232,16 @@ package net.gimite.snappy
 	                        return;
 	                    }
 	
-	                    _in.skipBytes(4);
-	                    var checksum:int = Bytes.swapInt(_in.readInt());
+	                    bytesIn.skipBytes(4);
+	                    var checksum:int = Bytes.swapInt(bytesIn.readInt());
 	                    var uncompressed:OutputByteBuffer = new OutputByteBuffer();
-	                    snappy.decode(_in.readSlice(chunkLength - 4), uncompressed);
+	                    snappy.decode(bytesIn.readSlice(chunkLength - 4), uncompressed);
 	                    if (validateChecksums)
 	                    {
 	                        var inUncompressed:InputByteBuffer = new InputByteBuffer(uncompressed.array());
 	                        Snappy.validateChecksum(checksum, inUncompressed, 0, uncompressed.getIndex());
 	                    }
-	                    _out.add(uncompressed.getBytes());
+	                    bytesOut.add(uncompressed.getBytes());
 	                    snappy.reset();
 	                    break;
 	            }

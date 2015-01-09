@@ -11,9 +11,10 @@ package net.gimite.snappy
 	    private var index:int = 0;
 	    private var markerIndex:int = 0;
 	
-	    public function InputByteBuffer()
+	    public function InputByteBuffer(length:int = 0)
 	    {
 	        super();
+			this.length = length;
 	    }
 	
 	    public function getIndex():int
