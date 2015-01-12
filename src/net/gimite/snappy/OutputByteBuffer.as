@@ -14,10 +14,10 @@ package net.gimite.snappy
 //	        this(DEFAULT_CAPACITY);
 //	    }
 
-		public function OutputByteBuffer(length:int = 256):void
+		public function OutputByteBuffer(length:int = 256):void	//ByteArray can dynamically expand its capacity
 		{
 			super();
-			this.length = length;
+//			this.length = length;
 		}
 	
 //	    public function OutputByteBuffer(capacity:int = DEFAULT_CAPACITY)	//overload with default arguments assignment

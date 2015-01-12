@@ -5,8 +5,8 @@ package net.gimite.snappy
 	 */
 	public class SnappyException extends Error
 	{
-		public functin SnappyException(){
-			
+		public function SnappyException(msg:String = ""){
+			super(msg);
 		}
 	}
 }
