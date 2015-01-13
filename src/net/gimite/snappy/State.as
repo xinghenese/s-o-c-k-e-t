@@ -13,7 +13,7 @@ package net.gimite.snappy
 		public static const READING_LITERAL:State = new State(3);
 		public static const READING_COPY:State = new State(4);
 		
-		private function State(value:int):void
+		public function State(value:int):void
 		{
 			this.value = value;
 		}

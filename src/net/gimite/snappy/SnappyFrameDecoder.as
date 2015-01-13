@@ -6,7 +6,13 @@ package net.gimite.snappy
 	 */
 	public class SnappyFrameDecoder
 	{		
-		private static const SNAPPY:ByteArray = new ByteArray();// = ['s', 'N', 'a', 'P', 'p', 'Y' ];
+		private static const SNAPPY:ByteArray = (function():ByteArray
+		{
+			var bytes:ByteArray = new ByteArray();
+			bytes.writeUTFBytes("sNaPpY");
+			return bytes;
+		})();//new ByteArray();// = ['s', 'N', 'a', 'P', 'p', 'Y' ];
+		
 	    private const snappy:Snappy = new Snappy();
 	    private var validateChecksums:Boolean;
 	    private var started:Boolean;
@@ -17,7 +23,7 @@ package net.gimite.snappy
 //	        this(false);
 //	    }
 	
-	    public function SnappyFramedDecoder(validateChecksums:Boolean = false)	//overload with default arguments assignment
+	    public function SnappyFramedDecoder(validateChecksums:Boolean = false):void	//overload with default arguments assignment
 	    {
 	        this.validateChecksums = validateChecksums;
 	    }
@@ -60,7 +66,8 @@ package net.gimite.snappy
 					{
 						break;
 					}
-					else{
+					else
+					{
 						continue;
 					}
 				}
@@ -76,7 +83,7 @@ package net.gimite.snappy
 	        {
 	            len += _each.length;
 	        }
-	        var buf:OutputByteBuffer = new OutputByteBuffer(len);
+	        var buf:OutputByteBuffer = new OutputByteBuffer();
 	        for (_each in bytesOut)
 	        {
 	            buf.writeBytes(_each);
@@ -128,7 +135,7 @@ package net.gimite.snappy
 	    {
 	        if (corrupted)
 	        {
-	            bytesIn.skipBytes(bytesIn.readableBytes());
+	            bytesIn.skipBytes(bytesIn.bytesAvailable);
 	            return;
 	        }
 	
@@ -145,7 +152,7 @@ package net.gimite.snappy
 	            }
 	
 	            const chunkTypeVal:uint = bytesIn.readUnsignedByte();
-	            const chunkType:ChunkType = mapChunkType(byte(chunkTypeVal));
+	            const chunkType:ChunkType = ChunkType.mapChunkType(chunkTypeVal);
 	            const chunkLength:int = Bytes.swapMedium(bytesIn.getUnsignedMedium(pos + 1));
 	
 	            switch (chunkType)
@@ -161,7 +168,7 @@ package net.gimite.snappy
 	                        break;
 	                    }
 	
-	                    var identifier:ByteArray = new byte[chunkLength];
+	                    var identifier:ByteArray = new ByteArray();//new byte[chunkLength];
 	                    bytesIn.skipBytes(4).readBytes(identifier);
 	
 	                    if (!Arrays.equals(identifier, SNAPPY))
@@ -193,7 +200,7 @@ package net.gimite.snappy
 	                    // the stream
 	                    // correctly
 	                    throw new SnappyException("Found reserved unskippable chunk type: 0x"
-	                            + Integer.toHexString(chunkTypeVal));
+	                            + chunkTypeVal.toString(16));
 	                case ChunkType.UNCOMPRESSED_DATA:
 	                    if (!started)
 	                    {
@@ -213,13 +220,13 @@ package net.gimite.snappy
 	                    if (validateChecksums)
 	                    {
 	                        var checksum:int = Bytes.swapInt(bytesIn.readInt());
-	                        Snappy.validateChecksum(checksum, bytesIn, bytesIn.getIndex(), chunkLength - 4);
+	                        Snappy.validateChecksum(checksum, bytesIn, bytesIn.position, chunkLength - 4);
 	                    }
 	                    else
 	                    {
 	                        bytesIn.skipBytes(4);
 	                    }
-	                    bytesOut.add(bytesIn.readSlice(chunkLength - 4).array());
+	                    bytesOut.push(bytesIn.readSlice(chunkLength - 4));
 	                    break;
 	                case ChunkType.COMPRESSED_DATA:
 	                    if (!started)
@@ -233,20 +240,20 @@ package net.gimite.snappy
 	                    }
 	
 	                    bytesIn.skipBytes(4);
-	                    var checksum:int = Bytes.swapInt(bytesIn.readInt());
+	                    checksum = Bytes.swapInt(bytesIn.readInt());
 	                    var uncompressed:OutputByteBuffer = new OutputByteBuffer();
 	                    snappy.decode(bytesIn.readSlice(chunkLength - 4), uncompressed);
 	                    if (validateChecksums)
 	                    {
 	                        var inUncompressed:InputByteBuffer = new InputByteBuffer(uncompressed.array());
-	                        Snappy.validateChecksum(checksum, inUncompressed, 0, uncompressed.getIndex());
+	                        Snappy.validateChecksum(checksum, inUncompressed, 0, uncompressed.position);
 	                    }
-	                    bytesOut.add(uncompressed.getBytes());
+	                    bytesOut.push(uncompressed.getBytes());
 	                    snappy.reset();
 	                    break;
 	            }
 	        }
-	        catch (Exception e)
+	        catch (e)
 	        {
 	            corrupted = true;
 	            throw e;

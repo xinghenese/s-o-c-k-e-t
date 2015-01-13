@@ -1,5 +1,6 @@
 package net.gimite.snappy
 {
+	import net.gimite.logger.Logger;
 	import flash.utils.ByteArray;
 	/**
 	 * @author Administrator
@@ -33,7 +34,7 @@ package net.gimite.snappy
 	     */
 //	    public static function calculateChecksum(data:InputByteBuffer):int //InputByteBuffer not implements in AS yet
 //	    {
-//	        return calculateChecksum(data, data.getIndex(), data.readableBytes());
+//	        return calculateChecksum(data, data.position, data.bytesAvailable);
 //	    }
 	
 	    /**
@@ -43,38 +44,48 @@ package net.gimite.snappy
 	     * @param data
 	     *            The input data to calculate the CRC32C checksum of
 	     */
-	    public static function calculateChecksum(data:InputByteBuffer, offset:int = data.getIndex(), length:int = data.readableBytes()):int	//overload with default arguments assignment
+	    public static function calculateChecksum(data:InputByteBuffer, offset:int = 0, length:int = 0):int	//overload with default arguments assignment
 	    {
+			offset = offset || data.position;
+			length = length || data.bytesAvailable;
 	        var crc32:Crc32c = new Crc32c(); //Crc32 not implements in AS yet
-	        try
-	        {
-	            crc32.update(data.array(), offset, length);
-	            return maskChecksum(int(crc32.getValue()));
-	        }
-	        finally
-	        {
-	            crc32.reset();
-	        }
+//	        try
+//	        {
+//	            crc32.update(data, offset, length);
+//	            return maskChecksum(int(crc32.getValue()));
+//	        }
+//			catch(e:Error)
+//			{
+//				return 0;
+//			}
+//	        finally
+//	        {
+//	            crc32.reset();
+//	        }
+			crc32.update(data, offset, length);
+			var value:int = crc32.getValue();
+			crc32.reset();
+            return maskChecksum(value);
 	    }
 	
-	    public function decode (bytes:ByteArray):ByteArray
-	    {
-	        var _in:InputByteBuffer = new InputByteBuffer(bytes);
-	        var _out:OutputByteBuffer = new OutputByteBuffer(); //OutputByteBuffer not implements in AS yet
-	        decode(_in, _out);
-	        return _out.getBytes();
-	    }
+//	    public function decode (bytes:ByteArray):ByteArray
+//	    {
+//	        var bytesIn:InputByteBuffer = InputByteBuffer(bytes);
+//	        var bytesOut:OutputByteBuffer = new OutputByteBuffer(); //OutputByteBuffer not implements in AS yet
+//	        decode(bytesIn, bytesOut);
+//	        return bytesOut.getBytes();
+//	    }
 	
-	    public function decode(_in:InputByteBuffer, _out:OutputByteBuffer):void
+	    public function decode(bytesIn:InputByteBuffer, bytesOut:OutputByteBuffer):void
 	    {
-	        while (_in.isReadable())
+	        while (bytesIn.isReadable())
 	        {
 	            switch (state)
 	            {
 	                case State.READY:
 	                    state = State.READING_PREAMBLE;
 	                case State.READING_PREAMBLE:
-	                    var uncompressedLength:int = readPreamble(_in);
+	                    var uncompressedLength:int = readPreamble(bytesIn);
 	                    if (uncompressedLength == PREAMBLE_NOT_FULL)
 	                    {
 	                        // We've not yet read all of the preamble, so wait until
@@ -88,14 +99,14 @@ package net.gimite.snappy
 	                        state = State.READY;
 	                        return;
 	                    }
-	                    _out.ensureWritable(uncompressedLength);
+	                    bytesOut.ensureWritable(uncompressedLength);
 	                    state = State.READING_TAG;
 	                case State.READING_TAG:
-	                    if (!_in.isReadable())
+	                    if (!bytesIn.isReadable())
 	                    {
 	                        return;
 	                    }
-	                    tag = _in.readByte();
+	                    tag = bytesIn.readByte();
 	                    switch (tag & 0x03)
 	                    {
 	                        case LITERAL:
@@ -109,7 +120,7 @@ package net.gimite.snappy
 	                    }
 	                    break;
 	                case State.READING_LITERAL:
-	                    var literalWritten:int = decodeLiteral(tag, _in, _out);
+	                    var literalWritten:int = decodeLiteral(tag, bytesIn, bytesOut);
 	                    if (literalWritten != NOT_ENOUGH_INPUT)
 	                    {
 	                        state = State.READING_TAG;
@@ -122,11 +133,11 @@ package net.gimite.snappy
 	                    }
 	                    break;
 	                case State.READING_COPY:
-	                    var decodeWritten;int;
+	                    var decodeWritten:int;
 	                    switch (tag & 0x03)
 	                    {
 	                        case COPY_1_BYTE_OFFSET:
-	                            decodeWritten = decodeCopyWith1ByteOffset(tag, _in, _out, written);
+	                            decodeWritten = decodeCopyWith1ByteOffset(tag, bytesIn, bytesOut, written);
 	                            if (decodeWritten != NOT_ENOUGH_INPUT)
 	                            {
 	                                state = State.READING_TAG;
@@ -139,7 +150,7 @@ package net.gimite.snappy
 	                            }
 	                            break;
 	                        case COPY_2_BYTE_OFFSET:
-	                            decodeWritten = decodeCopyWith2ByteOffset(tag, _in, _out, written);
+	                            decodeWritten = decodeCopyWith2ByteOffset(tag, bytesIn, bytesOut, written);
 	                            if (decodeWritten != NOT_ENOUGH_INPUT)
 	                            {
 	                                state = State.READING_TAG;
@@ -152,7 +163,7 @@ package net.gimite.snappy
 	                            }
 	                            break;
 	                        case COPY_4_BYTE_OFFSET:
-	                            decodeWritten = decodeCopyWith4ByteOffset(tag, _in, _out, written);
+	                            decodeWritten = decodeCopyWith4ByteOffset(tag, bytesIn, bytesOut, written);
 	                            if (decodeWritten != NOT_ENOUGH_INPUT)
 	                            {
 	                                state = State.READING_TAG;
@@ -169,21 +180,23 @@ package net.gimite.snappy
 	        }
 	    }
 	
-	    public function encode(_in:InputByteBuffer, _out:OutputByteBuffer):void
+	    public function encode(bytesIn:InputByteBuffer, bytesOut:OutputByteBuffer):void
 	    {
-	        var length:int = _in.readableBytes();
-	
+	        var length:int = bytesIn.bytesAvailable;
+				
 	        // Write the preamble length to the output array
+	        //将报文长度写入输出数组
+	        //采用小端字节序，将报文长度的有效数字依照每组七位分组，除大端组外，其余各组加前缀1，补齐1字节。而大端组前缀为0。最后将各组依从小端到大端的顺序写入输出数组中。
 	        for (var i:int = 0;; i++)
 	        {
-	            var b:int = length >>> i * 7;
-	            if ((b & 0xFFFFFF80) != 0)
+	            var b:int = length >>> i * 7; //依次从后往前取七位数（第一次从末尾第八位开始）
+	            if ((b & 0xFFFFFF80) != 0) //若以后每次取到均为0，则退出
 	            {
-	                _out.writeByte(int(b & 0x7f | 0x80)); //byte to int
+	                bytesOut.writeByte(b & 0x7f | 0x80); //在取得的七位数前加前缀1，补齐1字节，并写入到bytesOut中
 	            }
 	            else
 	            {
-	                _out.writeByte(int(b));
+	                bytesOut.writeByte(b);
 	                break;
 	            }
 	        }
@@ -191,17 +204,17 @@ package net.gimite.snappy
 	        var inIndex:int = 0;
 	        const baseIndex:int = 0;
 	
-	        const short[] table = getHashTable(length);
-	        const shift:int = 32 - (int(Math.floor(Math.log(table.length) / Math.log(2))));
+	        const table:Array = getHashTable(length);//short[] to ByteArray
+	        const shift:int = 32 - (int(Math.floor(Math.log(table.length) / Math.log(2)))); //shift = 32 - [log2(length)] = 32 - 14 or 32 - 8
 	        var nextEmit:int = inIndex;
 	
 	        if (length - inIndex >= MIN_COMPRESSIBLE_BYTES)
 	        {
-	            var nextHash:int = hash(_in, ++inIndex, shift);
+	            var nextHash:int = getHash(bytesIn, ++inIndex, shift);
 	            outer: while (true)
 	            {
 	                var skip:int = 32;
-	                var candidate:int ;
+	                var candidate:int;
 	                var nextIndex:int = inIndex;
 	                do
 	                {
@@ -216,22 +229,22 @@ package net.gimite.snappy
 	                        break outer;
 	                    }
 	
-	                    nextHash = hash(_in, nextIndex, shift);
+	                    nextHash = getHash(bytesIn, nextIndex, shift);
 	                    candidate = baseIndex + table[hash];
-	                    table[hash] = (short) (inIndex - baseIndex);
-	                } while (_in.getInt(inIndex) != _in.getInt(candidate));
+	                    table[hash] = Bytes.toShort(inIndex - baseIndex);
+	                } while (bytesIn.getInt(inIndex) != bytesIn.getInt(candidate));
 	
-	                encodeLiteral(_in, inIndex - nextEmit);
+	                encodeLiteral(bytesIn, bytesOut, inIndex - nextEmit);
 	
 	                var insertTail:int;
 	                do
 	                {
 	                    var base:int = inIndex;
-	                    var matched:int = 4 + findMatchingLength(_in, candidate + 4, inIndex + 4, length);
+	                    var matched:int = 4 + findMatchingLength(bytesIn, candidate + 4, inIndex + 4, length);
 	                    inIndex += matched;
 	                    var offset:int = base - candidate;
-	                    encodeCopy(_out, offset, matched);
-	                    _in.setIndex(_in.getIndex() + matched);
+	                    encodeCopy(bytesOut, offset, matched);
+	                    bytesIn.setIndex(bytesIn.position + matched);
 	                    insertTail = inIndex - 1;
 	                    nextEmit = inIndex;
 	                    if (inIndex >= length - 4)
@@ -239,14 +252,14 @@ package net.gimite.snappy
 	                        break outer;
 	                    }
 	
-	                    var prevHash:int = hash(_in, insertTail, shift);
-	                    table[prevHash] = (short) (inIndex - baseIndex - 1);
-	                    var currentHash:int = hash(_in, insertTail + 1, shift);
+	                    var prevHash:int = getHash(bytesIn, insertTail, shift);
+	                    table[prevHash] = Bytes.toShort(inIndex - baseIndex - 1);
+	                    var currentHash:int = getHash(bytesIn, insertTail + 1, shift);
 	                    candidate = baseIndex + table[currentHash];
-	                    table[currentHash] = (short) (inIndex - baseIndex);
-	                } while (_in.getInt(insertTail + 1) == _in.getInt(candidate));
+	                    table[currentHash] = Bytes.toShort(inIndex - baseIndex);
+	                } while (bytesIn.getInt(insertTail + 1) == bytesIn.getInt(candidate));
 	
-	                nextHash = hash(_in, insertTail + 2, shift);
+	                nextHash = getHash(bytesIn, insertTail + 2, shift);
 	                ++inIndex;
 	            }
 	        }
@@ -254,17 +267,17 @@ package net.gimite.snappy
 	        // If there are any remaining characters, write them out as a literal
 	        if (nextEmit < length)
 	        {
-	            encodeLiteral(_in, length - nextEmit);
+	            encodeLiteral(bytesIn, bytesOut, length - nextEmit);
 	        }
 	    }
 	
-	    public function encode(bytes:ByteArray):ByteArray
-	    {
-	        var _in:InputByteBuffer = new InputByteBuffer(bytes);
-	        var _out:OutputByteBuffer = new OutputByteBuffer();
-	        encode(_in, _out);
-	        return _out.getBytes();
-	    }
+//	    public function encode(bytes:ByteArray):ByteArray
+//	    {
+//	        var bytesIn:InputByteBuffer = InputByteBuffer(bytes);
+//	        var bytesOut:OutputByteBuffer = new OutputByteBuffer();
+//	        encode(bytesIn, bytesOut);
+//	        return bytesOut.getBytes();
+//	    }
 	
 	    public function reset():void
 	    {
@@ -302,13 +315,15 @@ package net.gimite.snappy
 	     * @throws SnappyException
 	     *             If the calculated and supplied checksums do not match
 	     */
-	    static function validateChecksum(expectedChecksum:int, data:InputByteBuffer, offset:int = data.getIndex(), length:int = data.readableBytes()):void	//overload with default arguments assignment
+	    static function validateChecksum(expectedChecksum:int, data:InputByteBuffer, offset:int = 0, length:int = 0):void	//overload with default arguments assignment
 	    {
+			offset = offset || data.position;
+			length = length || data.bytesAvailable;
 	        const actualChecksum:int = calculateChecksum(data, offset, length);
 	        if (actualChecksum != expectedChecksum)
 	        {
-	            throw new SnappyException("mismatching checksum: " + Integer.toHexString(actualChecksum) + " (expected: "
-	                    + Integer.toHexString(expectedChecksum) + ')');
+	            throw new SnappyException("mismatching checksum: " + actualChecksum.toString(16) + " (expected: "
+	                    + expectedChecksum.toString(16) + ')');
 	        }
 	    }
 	
@@ -326,7 +341,7 @@ package net.gimite.snappy
 	     */
 //	    static function validateChecksum(expectedChecksum:int, data:InputByteBuffer):void
 //	    {
-//	        validateChecksum(expectedChecksum, data, data.getIndex(), data.readableBytes());
+//	        validateChecksum(expectedChecksum, data, data.position, data.bytesAvailable);
 //	    }
 	
 	    /**
@@ -341,7 +356,7 @@ package net.gimite.snappy
 	     */
 	    private static function bitsToEncode(value:int):int
 	    {
-	        var highestOneBit:int = Integer.highestOneBit(value);
+	        var highestOneBit:int = Bytes.highestOneBit(value);
 	        var bitLength:int = 0;
 	        while ((highestOneBit >>= 1) != 0)
 	        {
@@ -368,16 +383,17 @@ package net.gimite.snappy
 	     * @throws SnappyException
 	     *             If the read offset is invalid
 	     */
-	    private static function decodeCopyWith1ByteOffset(tag:byte, _in:InputByteBuffer, _out:OutputByteBuffer, writtenSoFar:int):int
+	    private static function decodeCopyWith1ByteOffset(tag:int, bytesIn:InputByteBuffer, bytesOut:OutputByteBuffer, writtenSoFar:int):int
 	    {
-	        if (!_in.isReadable())
+			tag = Bytes.toByte(tag);
+	        if (!bytesIn.isReadable())
 	        {
 	            return NOT_ENOUGH_INPUT;
 	        }
 	
-	        var initialIndex:int = _out.getIndex();
+	        var initialIndex:int = bytesOut.position;
 	        var length:int = 4 + ((tag & 0x01c) >> 2);
-	        var offset:int = (tag & 0x0e0) << 8 >> 5 | _in.readUnsignedByte();
+	        var offset:int = (tag & 0x0e0) << 8 >> 5 | bytesIn.readUnsignedByte();
 	
 	        validateOffset(offset, writtenSoFar);
 	
@@ -386,16 +402,16 @@ package net.gimite.snappy
 	            var copies:int = length / offset;
 	            for (; copies > 0; copies--)
 	            {
-	                _out.writeBytes(_out.array(), initialIndex - offset, offset);
+	                bytesOut.writeBytes(bytesOut, initialIndex - offset, offset);
 	            }
 	            if (length % offset != 0)
 	            {
-	                _out.writeBytes(_out.array(), initialIndex - offset, length % offset);
+	                bytesOut.writeBytes(bytesOut, initialIndex - offset, length % offset);
 	            }
 	        }
 	        else
 	        {
-	            _out.writeBytes(_out.array(), initialIndex - offset, length);
+	            bytesOut.writeBytes(bytesOut, initialIndex - offset, length);
 	        }
 	
 	        return length;
@@ -418,16 +434,17 @@ package net.gimite.snappy
 	     * @throws SnappyException
 	     *             If the read offset is invalid
 	     */
-	    private static function decodeCopyWith2ByteOffset(tag:byte, _in:InputByteBuffer, _out:OutputByteBuffer, writtenSoFar:int):int
+	    private static function decodeCopyWith2ByteOffset(tag:int, bytesIn:InputByteBuffer, bytesOut:OutputByteBuffer, writtenSoFar:int):int
 	    {
-	        if (_in.readableBytes() < 2)
+			tag = Bytes.toByte(tag);
+	        if (bytesIn.bytesAvailable < 2)
 	        {
 	            return NOT_ENOUGH_INPUT;
 	        }
 	
-	        var initialIndex:int = _out.getIndex();
+	        var initialIndex:int = bytesOut.position;
 	        var length:int = 1 + (tag >> 2 & 0x03f);
-	        var offset:int = Bytes.swapShort(_in.readShort());
+	        var offset:int = Bytes.swapShort(bytesIn.readShort());
 	
 	        validateOffset(offset, writtenSoFar);
 	
@@ -436,16 +453,16 @@ package net.gimite.snappy
 	            var copies:int = length / offset;
 	            for (; copies > 0; copies--)
 	            {
-	                _out.writeBytes(_out.array(), initialIndex - offset, offset);
+	                bytesOut.writeBytes(bytesOut, initialIndex - offset, offset);
 	            }
 	            if (length % offset != 0)
 	            {
-	                _out.writeBytes(_out.array(), initialIndex - offset, length % offset);
+	                bytesOut.writeBytes(bytesOut, initialIndex - offset, length % offset);
 	            }
 	        }
 	        else
 	        {
-	            _out.writeBytes(_out.array(), initialIndex - offset, length);
+	            bytesOut.writeBytes(bytesOut, initialIndex - offset, length);
 	        }
 	
 	        return length;
@@ -468,40 +485,42 @@ package net.gimite.snappy
 	     * @throws SnappyException
 	     *             If the read offset is invalid
 	     */
-	    private static function decodeCopyWith4ByteOffset(tag:byte, _in:InputByteBuffer, _out:OutputByteBuffer, writtenSoFar:int):int
+	    private static function decodeCopyWith4ByteOffset(tag:int, bytesIn:InputByteBuffer, bytesOut:OutputByteBuffer, writtenSoFar:int):int
 	    {
-	        if readableBytes() < 4)
+			tag = Bytes.toByte(tag);
+	        if (bytesIn.bytesAvailable < 4)
 	        {
 	            return NOT_ENOUGH_INPUT;
 	        }
 	
-	        var initialIndex:int = _out.getIndex();
+	        var initialIndex:int = bytesOut.position;
 	        var length:int = 1 + (tag >> 2 & 0x03F);
-	        var offset:int = Bytes.swapIntreadInt());
+	        var offset:int = Bytes.swapInt(bytesIn.readInt());
 	
 	        validateOffset(offset, writtenSoFar);
 	
-	        var inBuf:InputByteBuffer = new InputByteBuffer(_out.getBytes());
-	        // _out.markReaderIndex();
+	        var inBuf:InputByteBuffer = InputByteBuffer(bytesOut.getBytes());
+	        // bytesOut.markReaderIndex();
 	        if (offset < length)
 	        {
 	            var copies:int = length / offset;
 	            for (; copies > 0; copies--)
 	            {
-	                _out.writeBytes(inBuf.array(), initialIndex - offset, offset);
+	                bytesOut.writeBytes(inBuf, initialIndex - offset, offset);
 	            }
 	            if (length % offset != 0)
 	            {
-	                _out.writeBytes(inBuf.array(), initialIndex - offset, length % offset);
+	                bytesOut.writeBytes(inBuf, initialIndex - offset, length % offset);
 	            }
 	        }
 	        else
 	        {
-	            _out.writeBytes(inBuf.array(), initialIndex - offset, length);
+	            bytesOut.writeBytes(inBuf, initialIndex - offset, length);
 	        }
 	
 	        return length;
 	    }
+	    import flash.utils.ByteArray;
 	
 	    /**
 	     * Reads a literal from the input array directly to the output array. A
@@ -518,53 +537,54 @@ package net.gimite.snappy
 	     * @return The number of bytes appended to the output array, or -1 to
 	     *         indicate "try again later"
 	     */
-	    private static function decodeLiteral(tag:byte, _in:InputByteBuffer, _out:OutputByteBuffer):int
+	    private static function decodeLiteral(tag:int, bytesIn:InputByteBuffer, bytesOut:OutputByteBuffer):int
 	    {
-	        _in.markIndex();
+			tag = Bytes.toByte(tag);
+	        bytesIn.markIndex();
 	        var length:int;
 	        switch (tag >> 2 & 0x3F)
 	        {
 	            case 60:
-	                if (!_in.isReadable())
+	                if (!bytesIn.isReadable())
 	                {
 	                    return NOT_ENOUGH_INPUT;
 	                }
-	                length = _in.readUnsignedByte();
+	                length = bytesIn.readUnsignedByte();
 	                break;
 	            case 61:
-	                if (_in.readableBytes() < 2)
+	                if (bytesIn.bytesAvailable < 2)
 	                {
 	                    return NOT_ENOUGH_INPUT;
 	                }
-	                length = Bytes.swapShort(_in.readShort());
+	                length = Bytes.swapShort(bytesIn.readShort());
 	                break;
 	            case 62:
-	                if (_in.readableBytes() < 3)
+	                if (bytesIn.bytesAvailable < 3)
 	                {
 	                    return NOT_ENOUGH_INPUT;
 	                }
-	                length = Bytes.swapMedium(_in.readUnsignedMedium());
+	                length = Bytes.swapMedium(bytesIn.readUnsignedMedium());
 	                break;
 	            case 64:
-	                if (_in.readableBytes() < 4)
+	                if (bytesIn.bytesAvailable < 4)
 	                {
 	                    return NOT_ENOUGH_INPUT;
 	                }
-	                length = Bytes.swapInt(_in.readInt());
+	                length = Bytes.swapInt(bytesIn.readInt());
 	                break;
 	            default:
 	                length = tag >> 2 & 0x3F;
 	        }
 	        length += 1;
 	
-	        if (_in.readableBytes() < length)
+	        if (bytesIn.bytesAvailable < length)
 	        {
-	            _in.resetIndex();
+	            bytesIn.resetIndex();
 	            return NOT_ENOUGH_INPUT;
 	        }
 	
-	        _out.writeBytes(_in.array(), _in.getIndex(), length);
-	        _in.setIndex(_in.getIndex() + length);
+	        bytesOut.writeBytes(bytesIn, bytesIn.position, length);
+	        bytesIn.setIndex(bytesIn.position + length);
 	        return length;
 	    }
 	
@@ -578,35 +598,35 @@ package net.gimite.snappy
 	     * @param length
 	     *            The length of the original instance
 	     */
-	    private static function encodeCopy(_out:OutputByteBuffer, offset:int, length:int):void
+	    private static function encodeCopy(bytesOut:OutputByteBuffer, offset:int, length:int):void
 	    {
 	        while (length >= 68)
 	        {
-	            encodeCopyWithOffset offset, 64);
+	            encodeCopyWithOffset(bytesOut, offset, 64);
 	            length -= 64;
 	        }
 	
 	        if (length > 64)
 	        {
-	            encodeCopyWithOffset offset, 60);
+	            encodeCopyWithOffset(bytesOut, offset, 60);
 	            length -= 60;
 	        }
 	
-	        encodeCopyWithOffset offset, length);
+	        encodeCopyWithOffset(bytesOut, offset, length);
 	    }
 	
-	    private static function encodeCopyWithOffset(_out:OutputByteBuffer, offset:int, length:int):void
+	    private static function encodeCopyWithOffset(bytesOut:OutputByteBuffer, offset:int, length:int):void
 	    {
 	        if (length < 12 && offset < 2048)
 	        {
-	            _out.writeByte((byte) (COPY_1_BYTE_OFFSET | length - 4 << 2 | offset >> 8 << 5));
-	            _out.writeByte((byte) (offset & 0x0ff));
+	            bytesOut.writeByte(COPY_1_BYTE_OFFSET | length - 4 << 2 | offset >> 8 << 5);
+	            bytesOut.writeByte(offset & 0x0ff);
 	        }
 	        else
 	        {
-	            _out.writeByte((byte) (COPY_2_BYTE_OFFSET | length - 1 << 2));
-	            _out.writeByte((byte) (offset & 0x0ff));
-	            _out.writeByte((byte) (offset >> 8 & 0x0ff));
+	            bytesOut.writeByte(COPY_2_BYTE_OFFSET | length - 1 << 2);
+	            bytesOut.writeByte(offset & 0x0ff);
+	            bytesOut.writeByte(offset >> 8 & 0x0ff);
 	        }
 	    }
 	
@@ -622,25 +642,25 @@ package net.gimite.snappy
 	     * @param length
 	     *            The length of the literal to copy
 	     */
-	    private static function encodeLiteral(_in:InputByteBuffer, _out:OutputByteBuffer, length:int):void
+	    private static function encodeLiteral(bytesIn:InputByteBuffer, bytesOut:OutputByteBuffer, length:int):void
 	    {
 	        if (length < 61)
 	        {
-	            _out.writeByte((byte) (length - 1 << 2));
+	            bytesOut.writeByte(length - 1 << 2);
 	        }
 	        else
 	        {
 	            var bitLength:int = bitsToEncode(length - 1);
 	            var bytesToEncode:int = 1 + bitLength / 8;
-	            _out.writeByte((byte) (59 + bytesToEncode << 2));
+	            bytesOut.writeByte(59 + bytesToEncode << 2);
 	            for (var i:int = 0; i < bytesToEncode; i++)
 	            {
-	                _out.writeByte((byte) (length - 1 >> i * 8 & 0x0ff));
+	                bytesOut.writeByte(length - 1 >> i * 8 & 0x0ff);
 	            }
 	        }
 	
-	        _out.writeBytes(_in.array(), _in.getIndex(), length);
-	        _in.setIndex(_in.getIndex() + length);
+	        bytesOut.writeBytes(bytesIn, bytesIn.position, length);
+	        bytesIn.setIndex(bytesIn.position + length);
 	    }
 	
 	    /**
@@ -658,17 +678,17 @@ package net.gimite.snappy
 	     *            The length of our input array
 	     * @return The number of bytes for which our candidate copy is a repeat of
 	     */
-	    private static function findMatchingLength(_in:InputByteBuffer, minIndex:int, inIndex:int, maxIndex:int):int
+	    private static function findMatchingLength(bytesIn:InputByteBuffer, minIndex:int, inIndex:int, maxIndex:int):int
 	    {
 	        var matched:int = 0;
 	
-	        while (inIndex <= maxIndex - 4 && _in.getInt(inIndex) == _in.getInt(minIndex + matched))
+	        while (inIndex <= maxIndex - 4 && bytesIn.getInt(inIndex) == bytesIn.getInt(minIndex + matched))
 	        {
 	            inIndex += 4;
 	            matched += 4;
 	        }
 	
-	        while (inIndex < maxIndex && _in.getByte(minIndex + matched) == _in.getByte(inIndex))
+	        while (inIndex < maxIndex && bytesIn.getByte(minIndex + matched) == bytesIn.getByte(inIndex))
 	        {
 	            ++inIndex;
 	            ++matched;
@@ -685,7 +705,7 @@ package net.gimite.snappy
 	     *            encode
 	     * @return An appropriately sized empty hashtable
 	     */
-	    private static function short[] getHashTable(int inputSize)
+	    private static function getHashTable(inputSize:int):Array	//short[] to ByteArray
 	    {
 	        var htSize:int = 256;
 	        while (htSize < MAX_HT_SIZE && htSize < inputSize)
@@ -693,15 +713,25 @@ package net.gimite.snappy
 	            htSize <<= 1;
 	        }
 	
-	        short[] table;
-	        if (htSize <= 256)
-	        {
-	            table = new short[256];
-	        }
-	        else
-	        {
-	            table = new short[MAX_HT_SIZE];
-	        }
+	        var table:Array = [];	//short[] to ByteArray
+	        if(htSize > 256)
+			{
+				htSize = MAX_HT_SIZE;
+			}
+			
+			for(var i:int = 0; i < htSize; i++)
+			{
+				table.push(0);
+			}
+	        
+//	        if (htSize <= 256)
+//	        {
+//	            table = new short[256];
+//	        }
+//	        else
+//	        {
+//	            table = new short[MAX_HT_SIZE];
+//	        }
 	
 	        return table;
 	    }
@@ -716,12 +746,12 @@ package net.gimite.snappy
 	     *            The index to read at
 	     * @param shift
 	     *            The shift value, for ensuring that the resulting value is
-	     *            withing the range of our hash table size
+	     *            within the range of our hash table size
 	     * @return A 32-bit hash of 4 bytes located at index
 	     */
-	    private static function hash(_in:InputByteBuffer, index:int, shift:int):int
+	    private static function getHash(bytesIn:InputByteBuffer, index:int, shift:int):int
 	    {
-	        return _in.getInt(index) + 0x1e35a7bd >>> shift;
+	        return bytesIn.getInt(index) + 0x1e35a7bd >>> shift;
 	    }
 	
 	    /**
@@ -733,13 +763,13 @@ package net.gimite.snappy
 	     * @return The calculated length based on the input array, or 0 if no
 	     *         preamble is able to be calculated
 	     */
-	    private static function readPreamble(_in:InputByteBuffer):int
+	    private static function readPreamble(bytesIn:InputByteBuffer):int
 	    {
 	        var length:int = 0;
 	        var byteIndex:int = 0;
-	        while (_in.isReadable())
+	        while (bytesIn.isReadable())
 	        {
-	            var current:int = _in.readUnsignedByte();
+	            var current:int = bytesIn.readUnsignedByte();
 	            length |= (current & 0x7f) << byteIndex++ * 7;
 	            if ((current & 0x80) == 0)
 	            {
@@ -769,7 +799,7 @@ package net.gimite.snappy
 	     */
 	    private static function validateOffset(offset:int, chunkSizeSoFar:int):void
 	    {
-	        if (offset > Short.MAX_VALUE)
+	        if (offset > Bytes.SHORT_MAX_VALUE)
 	        {
 	            throw new SnappyException("Offset exceeds maximum permissible value");
 	        }

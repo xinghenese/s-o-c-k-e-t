@@ -13,7 +13,7 @@ package net.gimite.snappy
 		public static const RESERVED_UNSKIPPABLE:ChunkType = new ChunkType(3);
 		public static const RESERVED_SKIPPABLE:ChunkType = new ChunkType(4);
 		
-		private function ChunkType(value:int)
+		public function ChunkType(value:int)
 		{
 			this.value = value;
 		}
@@ -28,6 +28,7 @@ package net.gimite.snappy
 	     */
 	    public static function mapChunkType(type:int):ChunkType //byte to int ChunkType to int
 	    {
+			type = Bytes.toByte(type);
 	        if (type == 0)
 	        {
 	            return ChunkType.COMPRESSED_DATA;

@@ -11,56 +11,59 @@ package net.gimite.snappy
 	    private var index:int = 0;
 	    private var markerIndex:int = 0;
 	
-	    public function InputByteBuffer(length:int = 0)
+	    public function InputByteBuffer()
 	    {
 	        super();
-			this.length = length;
 	    }
+		
+		public static function fromByteArray(bytes:ByteArray):InputByteBuffer
+		{
+			var buffer:InputByteBuffer = new InputByteBuffer(), pos:int = bytes.position;
+			bytes.position = 0;
+			bytes.readBytes(buffer);
+			bytes.position = pos;
+			return buffer;
+		}
 	
-	    public function getIndex():int
-	    {
-	        return this.position;
-	    }
-	
-	    public function getByte(offset:int = position):int //byte to int
+	    public function getByte(offset:int = -1):int //byte to int
 	    {
 			return getData(1, offset);
 	    }
 	
-	    public function getInt(offset:int = position):int
+	    public function getInt(offset:int = -1):int
 	    {
 	        return getData(4, offset);
 	    }
 	
-	    public function getUnsignedByte(offset:int = position):uint //short to int
+	    public function getUnsignedByte(offset:int = -1):uint //short to int
 	    {
 	        return uint(getByte(offset) & 0xFF);
 	    }
 	
-	    public function getUnsignedMedium(offset:int = position):int
+	    public function getUnsignedMedium(offset:int = -1):int
 	    {
 	        return getData(3, offset);
 	    }
 		
-		private function getData(size:int, offset:int = position):int
+		private function getData(size:int, offset:int = -1):int
 		{
+			var pos:int = position;
 			checkIndex(offset, size);
+			if(offset >= 0)
+			{
+				position = offset;
+			}
 			for(var i:int = 0, data:int = 0, bit:int = 8; i < size; i++)
 			{
 				data |= (super.readByte() & 0xff) << (bit * (size - 1 - i));
 			}
-			position -= size;
+			position = pos;
 			return data;			
 		}
 	
 	    public function isReadable():Boolean
 	    {
 	        return this.bytesAvailable > 0;
-	    }
-	
-	    public function length():int
-	    {
-	        return length;
 	    }
 	
 	    public function markIndex():void
@@ -77,22 +80,19 @@ package net.gimite.snappy
 	        if (bytesAvailable < length)
 	        {
 	            throw new RangeError();
-	        }	
+	        }
+			var result:InputByteBuffer = new InputByteBuffer();
+			readBytes(result, position, length);	
 //	        var result:InputByteBuffer = Array.prototype.slice.call(this, position, position = position + length); //Array.prototype.slice in AS acts as if Arrays.copyOfRange in Java
 //	        return result;
-			return InputByteBuffer(Array.prototype.slice.call(this, position, position = position + length));
+			return result;
 	    }
 	
 	    public function readUnsignedMedium():int
 	    {
-	        var data = getData(3);
+	        var data:int = getData(3);
 			position += 3;
 	        return data;
-	    }
-	
-	    public function readableBytes():int
-	    {
-	        return bytesAvailable;
 	    }
 	
 	    public function resetIndex():void

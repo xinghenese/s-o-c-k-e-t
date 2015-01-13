@@ -6,29 +6,10 @@ package net.gimite.snappy
 	 */
 	public class OutputByteBuffer extends ByteArray
 	{
-//	    private var buf:ByteArray;
-//	    private var index:int;
-	
-//	    public function OutputByteBuffer()
-//	    {
-//	        this(DEFAULT_CAPACITY);
-//	    }
-
-		public function OutputByteBuffer(length:int = 256):void	//ByteArray can dynamically expand its capacity
+		public function OutputByteBuffer():void	//ByteArray can dynamically expand its capacity
 		{
 			super();
-//			this.length = length;
 		}
-	
-//	    public function OutputByteBuffer(capacity:int = DEFAULT_CAPACITY)	//overload with default arguments assignment
-//	    {
-//	        this.buf = new byte[capacity];
-//	    }
-//	
-//	    public function array():ByteArray
-//	    {
-//	        return buf;
-//	    }
 	
 	    public function ensureWritable(length:int):void
 	    {
@@ -43,15 +24,15 @@ package net.gimite.snappy
 	
 	    public function getBytes():ByteArray
 	    {
-			return ByteArray(Array.prototype.slice.call(this, 0, position));
+			var bytes:ByteArray = new ByteArray(), length:int = position + 1;
+			position = 0;
+			readBytes(bytes, 0, length);
+			position = length - 1;
+			return bytes;
+//			return ByteArray(Array.prototype.slice.call(this, 0, position));
 //	        var bytes:ByteArray = new byte[index];
 //	        System.arraycopy(buf, 0, bytes, 0, index);
 //	        return bytes;
-	    }
-	
-	    public function getIndex():int
-	    {
-	        return position;
 	    }
 	
 	    public function setMedium(offset:int, value:int):void
@@ -59,25 +40,25 @@ package net.gimite.snappy
 	        setData(3, value, offset);
 	    }
 	
-//	    public function writeBytes(bytes:ByteArray):void
-//	    {
-//	        writeBytes(bytes, 0, bytes.length);
-//	    }
-	
 	    public function writeMedium(value:int):void
 	    {
 	        setData(3, value);
 			position += 3;
 	    }
 		
-		private function setData(size:int, bytes:int, offset:int = position):void
+		private function setData(size:int, bytes:int, offset:int = -1):void
 		{
+			var pos:int = position;
+			if(offset >= 0)
+			{
+				position = offset;
+			}
 //			checkCapacity(size);
 			for(var i:int = size - 1; i >= 0; i--)
 			{
 				writeByte((bytes >> i) & 0xFF);
 			}
-			position -= size;
+			position = pos;
 		}
 	
 //	    private function checkCapacity(expandLength:int):void
