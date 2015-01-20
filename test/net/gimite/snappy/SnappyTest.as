@@ -64,17 +64,55 @@ package net.gimite.snappy
 		
 		private var bytesIn:Array = [60, 77, 83, 71, 82, 69, 65, 68, 67, 70, 77, 32, 118, 101, 114, 61, 34, 51, 46, 56, 46, 49, 53, 46, 53, 34, 32, 109, 115, 113, 105, 100, 61, 34, 49, 50, 52, 108, 57, 49, 108, 51, 108, 49, 49, 50, 108, 50, 49, 108, 49, 48, 55, 34, 32, 114, 109, 116, 112, 61, 34, 51, 34, 32, 117, 117, 105, 100, 61, 34, 48, 57, 49, 48, 99, 101, 56, 57, 45, 50, 101, 57, 54, 45, 52, 55, 49, 52, 45, 98, 49, 54, 53, 45, 56, 97, 53, 57, 56, 97, 54, 101, 102, 100, 52, 99, 34, 32, 109, 115, 99, 115, 61, 34, 49, 52, 50, 49, 48, 53, 51, 51, 48, 51, 48, 50, 53, 34, 32, 109, 115, 117, 105, 100, 61, 34, 51, 48, 48, 49, 49, 54, 55, 52, 34, 32, 109, 115, 116, 117, 105, 100, 61, 34, 51, 48, 48, 49, 48, 53, 57, 49, 34, 62, 60, 47, 77, 83, 71, 82, 69, 65, 68, 67, 70, 77, 62];
 		
+		private var dataBytes:ByteArray = (function():ByteArray
+		{
+			var data:String = "<HSK pbk='ALnzSocstfzO0BGKTvkfXQzkznHuouycRKYLoETeMqlqMrI18rV75H7LnxWtejczR9xc3f5my9/DtyKnjI56l48NRqLLOopiE+VkR/vi6ktnPJJZgk8POP338hOTif2RKXjU31qAdbozdIe8+b9NEnhlR6lLdzGL+LU6xGaxSW3/'></HSK>";
+			var _data:String = "<MSGREADCFM ver='3.8.15.5' msqid='124l91l3l112l21l107' rmtp='3' uuid='0910ce89-2e96-4714-b165-8a598a6efd4c' mscs='1421053303025' msuid='30011674' mstuid='30010591'></MSGREADCFM>"
+			var bytes:ByteArray = new ByteArray();
+			bytes.writeUTFBytes(data);
+			Logger.info("dataString", bytes.toString());
+			Logger.info("dataArray", Bytes.toArrayString(bytes));
+			return bytes;
+		})();
+		
+		public var result:String = "";
+		public var resultBytes:ByteArray;
+				
 		public static function snappyEncode(bytes:ByteArray):ByteArray
 		{
 			if(!(bytes is InputByteBuffer))
 			{
 				bytes = InputByteBuffer.fromByteArray(bytes);
 			}
+			var _out:OutputByteBuffer = new OutputByteBuffer(), snappy:Snappy = new Snappy(), encoder:SnappyFrameEncoder = new SnappyFrameEncoder();
+			var out:ByteArray = encoder.encode(bytes);
+//			snappy.encode(InputByteBuffer(bytes), out);
+			Logger.info("ouputString", out.toString());
+			Logger.info("outputArray", Bytes.toArrayString(out));
+			Logger.info("length", out.length);
+			
+			var header:ByteArray = new ByteArray();
+			header.writeInt(out.length);
+			header.writeBytes(out);
+			Logger.log();
+			Logger.info("ouputString", header.toString());
+			Logger.info("outputArray", Bytes.toArrayString(header));
+			Logger.info("length", header.length);
+
+			return header;
+		}
+		
+		public static function snappyDecode(bytes:ByteArray):ByteArray
+		{
+			if(!(bytes is OutputByteBuffer))
+			{
+				bytes = OutputByteBuffer.fromByteArray(bytes);
+			}
 			var out:OutputByteBuffer = new OutputByteBuffer(), snappy:Snappy = new Snappy();
 			snappy.encode(InputByteBuffer(bytes), out);
 			return out;
 		}
-				
+		
 		public function SnappyTest()
 		{
 //			var loader:Loader = new Loader();
@@ -88,13 +126,19 @@ package net.gimite.snappy
 //			Logger.info("a", snappy);
 //			toArray(STREAM_START, 0, 4);
 			Logger.log();
-			var bytes:ByteArray = Bytes.fromArray(bytesIn);
-			Logger.info("bytes", bytes.toString());
-			Logger.info("value", Bytes.toArrayString(bytes));
 			
-			var result:ByteArray = snappyEncode(bytes);
-			Logger.info("bytes", result.toString());
-			Logger.info("value", Bytes.toArrayString(result));
+//			var bytes:ByteArray = Bytes.fromArray(bytesIn);
+//			Logger.info("bytes", bytes.toString());
+//			Logger.info("value", Bytes.toArrayString(bytes));
+			
+//			var result:ByteArray = snappyEncode(dataBytes);
+			
+			resultBytes = snappyEncode(dataBytes);
+			result = resultBytes.toString();
+			
+			Logger.info("bytes", result);
+//			Logger.info("value", Bytes.toArrayString(result));
+			
 		}		
 	}
 }
