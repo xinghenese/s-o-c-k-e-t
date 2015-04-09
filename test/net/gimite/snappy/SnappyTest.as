@@ -1,5 +1,6 @@
 package net.gimite.snappy
 {
+	import flash.external.ExternalInterface;
 	import flash.utils.ByteArray;
 	import net.gimite.logger.Logger;
 	import flash.net.URLRequest;
@@ -66,12 +67,13 @@ package net.gimite.snappy
 		
 		private var dataBytes:ByteArray = (function():ByteArray
 		{
-			var data:String = "<HSK pbk='ALnzSocstfzO0BGKTvkfXQzkznHuouycRKYLoETeMqlqMrI18rV75H7LnxWtejczR9xc3f5my9/DtyKnjI56l48NRqLLOopiE+VkR/vi6ktnPJJZgk8POP338hOTif2RKXjU31qAdbozdIe8+b9NEnhlR6lLdzGL+LU6xGaxSW3/'></HSK>";
-			var _data:String = "<MSGREADCFM ver='3.8.15.5' msqid='124l91l3l112l21l107' rmtp='3' uuid='0910ce89-2e96-4714-b165-8a598a6efd4c' mscs='1421053303025' msuid='30011674' mstuid='30010591'></MSGREADCFM>"
+			var _data:String = "<HSK pbk='ALnzSocstfzO0BGKTvkfXQzkznHuouycRKYLoETeMqlqMrI18rV75H7LnxWtejczR9xc3f5my9/DtyKnjI56l48NRqLLOopiE+VkR/vi6ktnPJJZgk8POP338hOTif2RKXjU31qAdbozdIe8+b9NEnhlR6lLdzGL+LU6xGaxSW3/'></HSK>";
+			var data2:String = "<MSGREADCFM ver='3.8.15.5' msqid='124l91l3l112l21l107' rmtp='3' uuid='0910ce89-2e96-4714-b165-8a598a6efd4c' mscs='1421053303025' msuid='30011674' mstuid='30010591'></MSGREADCFM>";
+			var data:String = '<HSK pbk="XHBxevmo8lAe34xM87jE+3dYxfEOhnjqt/Ca2I4PZk9SorG5v+ns4dbEn2vOoUlfScFBIAht0bylxiiBq27y3Ia08aDEYqe6b/x8uuBGfRmuAc9OT4eLFeJsrmmzDzDtTIoWHPnRv9V045oIKVnRN5girx9muphhL/AVSPQ3lGA="></HSK>';
 			var bytes:ByteArray = new ByteArray();
 			bytes.writeUTFBytes(data);
-			Logger.info("dataString", bytes.toString());
-			Logger.info("dataArray", Bytes.toArrayString(bytes));
+//			Logger.info("dataString", bytes.toString());
+//			Logger.info("dataArray", Bytes.toArrayString(bytes));
 			return bytes;
 		})();
 		
@@ -87,17 +89,17 @@ package net.gimite.snappy
 			var _out:OutputByteBuffer = new OutputByteBuffer(), snappy:Snappy = new Snappy(), encoder:SnappyFrameEncoder = new SnappyFrameEncoder();
 			var out:ByteArray = encoder.encode(bytes);
 //			snappy.encode(InputByteBuffer(bytes), out);
-			Logger.info("ouputString", out.toString());
-			Logger.info("outputArray", Bytes.toArrayString(out));
-			Logger.info("length", out.length);
+//			Logger.info("ouputString", out.toString());
+//			Logger.info("outputArray", Bytes.toArrayString(out));
+//			Logger.info("length", out.length);
 			
 			var header:ByteArray = new ByteArray();
 			header.writeInt(out.length);
 			header.writeBytes(out);
-			Logger.log();
-			Logger.info("ouputString", header.toString());
-			Logger.info("outputArray", Bytes.toArrayString(header));
-			Logger.info("length", header.length);
+//			Logger.log();
+//			Logger.info("ouputString", header.toString());
+//			Logger.info("outputArray", Bytes.toArrayString(header));
+//			Logger.info("length", header.length);
 
 			return header;
 		}
@@ -125,7 +127,7 @@ package net.gimite.snappy
 //			Logger.info("Test", "Snappy");
 //			Logger.info("a", snappy);
 //			toArray(STREAM_START, 0, 4);
-			Logger.log();
+//			Logger.log();
 			
 //			var bytes:ByteArray = Bytes.fromArray(bytesIn);
 //			Logger.info("bytes", bytes.toString());
@@ -136,7 +138,7 @@ package net.gimite.snappy
 			resultBytes = snappyEncode(dataBytes);
 			result = resultBytes.toString();
 			
-			Logger.info("bytes", result);
+//			Logger.info("bytes", "result");
 //			Logger.info("value", Bytes.toArrayString(result));
 			
 		}		

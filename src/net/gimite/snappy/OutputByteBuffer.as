@@ -10,6 +10,15 @@ package net.gimite.snappy
 		{
 			super();
 		}
+		
+		public static function fromByteArray(bytes:ByteArray):OutputByteBuffer
+		{
+			var buffer:OutputByteBuffer = new OutputByteBuffer(), pos:int = bytes.position;
+			bytes.position = 0;
+			bytes.readBytes(buffer);
+			bytes.position = pos;
+			return buffer;
+		}
 	
 	    public function ensureWritable(length:int):void
 	    {
@@ -24,10 +33,10 @@ package net.gimite.snappy
 	
 	    public function getBytes():ByteArray
 	    {
-			var bytes:ByteArray = new ByteArray(), length:int = position + 1;
+			var bytes:ByteArray = new ByteArray(), length:int = position;
 			position = 0;
 			readBytes(bytes, 0, length);
-			position = length - 1;
+			position = length;
 			return bytes;
 //			return ByteArray(Array.prototype.slice.call(this, 0, position));
 //	        var bytes:ByteArray = new byte[index];

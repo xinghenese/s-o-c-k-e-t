@@ -1,5 +1,6 @@
 package net.gimite.snappy
 {
+	import net.gimite.logger.Logger;
 	import flash.utils.ByteArray;
 	/**
 	 * @author Administrator
@@ -60,15 +61,42 @@ package net.gimite.snappy
 	    //@Override
 	    public function update(buffer:ByteArray, offset:int, length:int):void
 	    {
+			Logger.log("crc_original: " + crc.toString());
+			var arr_str:String = "[";
 	        for (var i:int = offset; i < offset + length; i++)
 	        {
+//				Logger.log("[" + i + "] crc: " + crc.toString(16));
 	            crc = crc32c(crc, buffer[i]);
+				arr_str = arr_str + ", " + crc;
 	        }
+			arr_str = arr_str + "]";
+			Logger.log("str: " + arr_str);
+//			Logger.log("crc: " + crc.toString(16));
 	    }
 	
+		//寄存器crc右移一个字节，移出的字节与buffer的第i个字节进行XOR运算，所得值作为CRC_TABLE的索引，取该下标对应的元素，与寄存器crc作XOR运算，运算结果存储在寄存器crc中。
+		//如此反复，直到读完给定区间的buffer片段数据。
 	    private static function crc32c(crc:int, b:int):int
 	    {
 	        return crc >>> 8 ^ CRC_TABLE[(crc ^ b & BYTE_MASK) & BYTE_MASK];
 	    }
+		
+		//Test
+		public static function crc32table(k:int = 4):Array{
+			var _table:Array = new Array(256);
+			for (var i:int = 0; i < 256; i++){
+				var _crc:int = i;
+				for(var j:int = 0; j < 8; j++){
+					if(_crc & 1){
+						_crc = (_crc >> 1) ^ 0xEDB88320;
+					}
+					else{
+						_crc >>= 1;
+					}
+				}
+				_table[i] = _crc;
+			}
+			return _table;
+		}
 	}
 }

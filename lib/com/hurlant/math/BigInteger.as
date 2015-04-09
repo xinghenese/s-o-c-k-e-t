@@ -79,7 +79,7 @@ package com.hurlant.math
 				case 16:  k=4; break;
 				case 32:  k=5; break;
 				default:
-//					return toRadix(radix);
+					return toRadix(radix);
 			}
 			var km:int = (1<<k)-1;
 			var d:int = 0;

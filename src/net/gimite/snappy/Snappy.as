@@ -62,9 +62,18 @@ package net.gimite.snappy
 //	        {
 //	            crc32.reset();
 //	        }
+
+//			var arr:Array = Crc32c.crc32table(1);
+//			for(var i:int = 0, len:int = arr.length; i < len; i++){
+//				Logger.log("CRC32_TABLE[" + i + "]: " + int(arr[i]).toString(16));
+//			}
+
+			Logger.log("original-string: " + data.toString());
 			crc32.update(data, offset, length);
 			var value:int = crc32.getValue();
+			Logger.log("crc32.value: " + value.toString());
 			crc32.reset();
+			Logger.log("maskChecksum: " + (maskChecksum(value)).toString());
             return maskChecksum(value);
 	    }
 	

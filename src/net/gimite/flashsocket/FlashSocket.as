@@ -1,5 +1,6 @@
 package net.gimite.flashsocket
 {
+	import flash.utils.ByteArray;
 	import net.gimite.snappy.SnappyTest;
 	import flash.events.ProgressEvent;
 	import flash.events.IOErrorEvent;
@@ -20,7 +21,7 @@ package net.gimite.flashsocket
 			if(host){
 				loadPolicyFile(host);
 				super.connect(host, port);
-				Logger.log("connecting");
+				Logger.log("connecting to " + host + ":" + port);
 			}
 		}
 		
@@ -49,7 +50,9 @@ package net.gimite.flashsocket
 		public function connectHandler(e:Event):void
 		{
 			Logger.info("onConnect", e.toString());
-			writeBytes((new SnappyTest()).resultBytes);
+			var bytes:ByteArray = (new SnappyTest()).resultBytes;
+			Logger.info("sendData", bytes);
+			writeBytes(bytes);
 			flush();
 		}
 		

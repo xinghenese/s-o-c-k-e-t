@@ -1,5 +1,6 @@
 package net.gimite.snappy
 {
+	import net.gimite.logger.Logger;
 	import flash.utils.ByteArray;
 	/**
 	 * @author Administrator
@@ -74,7 +75,17 @@ package net.gimite.snappy
 	                if (dataLength > Bytes.SHORT_MAX_VALUE)
 	                {
 	                    slice = bytesIn.readSlice(Bytes.SHORT_MAX_VALUE);
+						Logger.log("before: " + bytesOut.toString());
+						Logger.log("before-length: " + bytesOut.length);
 	                    calculateAndWriteChecksum(slice, bytesOut);
+						
+						var bytes:ByteArray = bytesOut.getBytes();
+						
+						Logger.log("length: " + bytes.bytesAvailable);
+						Logger.log("checked-bytes: " + bytes.toString());
+						Logger.log("checked-bytesout: " + bytesOut.toString());
+						Logger.log("checked-int1: " + bytes.readInt());
+						Logger.log("checked-int2: " + bytes.readInt());
 	                    snappy.encode(slice, bytesOut);
 	                    setChunkLength(bytesOut, lengthIdx);
 	                    dataLength -= Bytes.SHORT_MAX_VALUE;
@@ -82,7 +93,17 @@ package net.gimite.snappy
 	                else
 	                {
 	                    slice = bytesIn.readSlice(dataLength);
+						Logger.log("before: " + bytesOut.toString());
+						Logger.log("before-length: " + bytesOut.length);
 	                    calculateAndWriteChecksum(slice, bytesOut);
+						
+						var bytes:ByteArray = bytesOut.getBytes();
+						
+						Logger.log("length: " + bytes.bytesAvailable);
+						Logger.log("checked-bytes: " + bytes.toString());
+						Logger.log("checked-bytesout: " + bytesOut.toString());
+						Logger.log("checked-int1: " + bytes.readInt());
+						Logger.log("checked-int2: " + bytes.readInt());
 	                    snappy.encode(slice, bytesOut);
 	                    setChunkLength(bytesOut, lengthIdx);
 	                    break;

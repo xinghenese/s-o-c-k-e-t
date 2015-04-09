@@ -245,7 +245,7 @@ package net.gimite.snappy
 	                    snappy.decode(bytesIn.readSlice(chunkLength - 4), uncompressed);
 	                    if (validateChecksums)
 	                    {
-	                        var inUncompressed:InputByteBuffer = new InputByteBuffer(uncompressed.array());
+	                        var inUncompressed:InputByteBuffer = InputByteBuffer(uncompressed);
 	                        Snappy.validateChecksum(checksum, inUncompressed, 0, uncompressed.position);
 	                    }
 	                    bytesOut.push(uncompressed.getBytes());

@@ -1,5 +1,6 @@
 package net.gimite.snappy
 {
+	import net.gimite.logger.Logger;
 	import flash.utils.ByteArray;
 	/**
 	 * @author Administrator
@@ -53,6 +54,7 @@ package net.gimite.snappy
 	     */
 	    public static function swapInt(value:int):int
 	    {
+			Logger.log("swapInt: " + reverseBytesFromInt(value));
 	        return reverseBytesFromInt(value);
 	    }
 	
@@ -163,9 +165,12 @@ package net.gimite.snappy
 			return i & 0xFFFFFF;
 		}
 		
-		public static function fromArray(arr:Array):ByteArray
+		public static function fromArray(arr:Array, big_endian:Boolean = true):ByteArray
 		{
 			var bytes:ByteArray = new ByteArray();
+			if(!big_endian){
+				arr.reverse();
+			}
 			arr.forEach(function(item:*, index:int, array:Array):void
 			{
 				bytes.writeByte(int(item));
