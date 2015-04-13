@@ -39,7 +39,7 @@ package net.gimite.snappy
 	
 	    public function encode(bytes:ByteArray):ByteArray// throws Exception
 	    {
-			var bytesIn:InputByteBuffer = InputByteBuffer.fromByteArray(bytes);
+			var bytesIn:InputByteBuffer = new InputByteBuffer(bytes);
 	        var bytesOut:OutputByteBuffer = new OutputByteBuffer();
 	        encodeBytesBuffer(bytesIn, bytesOut);
 	        return bytesOut.getBytes();
@@ -56,6 +56,8 @@ package net.gimite.snappy
 	        {
 	            started = true;
 	            bytesOut.writeBytes(STREAM_START);
+				Logger.info("STREAM_START", STREAM_START);
+				Logger.info("STREAM_START", Bytes.toArrayString(STREAM_START));
 	        }
 	
 	        var dataLength:int = bytesIn.bytesAvailable;
@@ -75,37 +77,24 @@ package net.gimite.snappy
 	                if (dataLength > Bytes.SHORT_MAX_VALUE)
 	                {
 	                    slice = bytesIn.readSlice(Bytes.SHORT_MAX_VALUE);
-						Logger.log("before: " + bytesOut.toString());
-						Logger.log("before-length: " + bytesOut.length);
-	                    calculateAndWriteChecksum(slice, bytesOut);
+	                    calculateAndWriteChecksum(slice, bytesOut);				
 						
 						var bytes:ByteArray = bytesOut.getBytes();
-						
-						Logger.log("length: " + bytes.bytesAvailable);
-						Logger.log("checked-bytes: " + bytes.toString());
-						Logger.log("checked-bytesout: " + bytesOut.toString());
-						Logger.log("checked-int1: " + bytes.readInt());
-						Logger.log("checked-int2: " + bytes.readInt());
 	                    snappy.encode(slice, bytesOut);
 	                    setChunkLength(bytesOut, lengthIdx);
+						
 	                    dataLength -= Bytes.SHORT_MAX_VALUE;
 	                }
 	                else
 	                {
 	                    slice = bytesIn.readSlice(dataLength);
-						Logger.log("before: " + bytesOut.toString());
-						Logger.log("before-length: " + bytesOut.length);
 	                    calculateAndWriteChecksum(slice, bytesOut);
 						
 						var bytes:ByteArray = bytesOut.getBytes();
-						
-						Logger.log("length: " + bytes.bytesAvailable);
-						Logger.log("checked-bytes: " + bytes.toString());
-						Logger.log("checked-bytesout: " + bytesOut.toString());
-						Logger.log("checked-int1: " + bytes.readInt());
-						Logger.log("checked-int2: " + bytes.readInt());
-	                    snappy.encode(slice, bytesOut);
+	                    snappy.encode(slice, bytesOut);				
+				
 	                    setChunkLength(bytesOut, lengthIdx);
+				
 	                    break;
 	                }
 	            }
@@ -132,11 +121,12 @@ package net.gimite.snappy
 	    private static function setChunkLength(bytesOut:OutputByteBuffer, lengthIdx:int):void
 	    {
 	        var chunkLength:int = bytesOut.position - lengthIdx - 3;
+			Logger.log('chunkLength: ' + chunkLength);
 	        if (chunkLength >>> 24 != 0)
 	        {
 	            throw new SnappyException("compressed data too large: " + chunkLength);
 	        }
-	        bytesOut.setMedium(lengthIdx, Bytes.swapMedium(chunkLength));
+	        bytesOut.setMedium(lengthIdx - 1, Bytes.swapMedium(chunkLength));
 	    }
 	
 	    /**

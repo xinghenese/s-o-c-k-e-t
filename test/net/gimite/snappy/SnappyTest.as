@@ -1,5 +1,6 @@
 package net.gimite.snappy
 {
+	import net.gimite.util.ByteArrayUtil;
 	import flash.external.ExternalInterface;
 	import flash.utils.ByteArray;
 	import net.gimite.logger.Logger;
@@ -84,7 +85,7 @@ package net.gimite.snappy
 		{
 			if(!(bytes is InputByteBuffer))
 			{
-				bytes = InputByteBuffer.fromByteArray(bytes);
+				bytes = new InputByteBuffer(bytes);
 			}
 			var _out:OutputByteBuffer = new OutputByteBuffer(), snappy:Snappy = new Snappy(), encoder:SnappyFrameEncoder = new SnappyFrameEncoder();
 			var out:ByteArray = encoder.encode(bytes);
@@ -92,6 +93,9 @@ package net.gimite.snappy
 //			Logger.info("ouputString", out.toString());
 //			Logger.info("outputArray", Bytes.toArrayString(out));
 //			Logger.info("length", out.length);
+
+			Logger.info('LENGTH', out.length);
+			Logger.info('LENGTH', ByteArrayUtil.toByteString(out.length));
 			
 			var header:ByteArray = new ByteArray();
 			header.writeInt(out.length);
@@ -138,8 +142,8 @@ package net.gimite.snappy
 			resultBytes = snappyEncode(dataBytes);
 			result = resultBytes.toString();
 			
-//			Logger.info("bytes", "result");
-//			Logger.info("value", Bytes.toArrayString(result));
+//			Logger.info("bytes", result);
+//			Logger.info("value", Bytes.toArrayString(resultBytes));
 			
 		}		
 	}

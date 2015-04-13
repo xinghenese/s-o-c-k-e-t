@@ -1,5 +1,6 @@
 package net.gimite.flashsocket
 {
+	import net.gimite.snappy.Bytes;
 	import flash.utils.ByteArray;
 	import net.gimite.snappy.SnappyTest;
 	import flash.events.ProgressEvent;
@@ -52,6 +53,7 @@ package net.gimite.flashsocket
 			Logger.info("onConnect", e.toString());
 			var bytes:ByteArray = (new SnappyTest()).resultBytes;
 			Logger.info("sendData", bytes);
+			Logger.info("sendData", Bytes.toArrayString(bytes));
 			writeBytes(bytes);
 			flush();
 		}

@@ -54,7 +54,7 @@ package net.gimite.snappy
 	     */
 	    public static function swapInt(value:int):int
 	    {
-			Logger.log("swapInt: " + reverseBytesFromInt(value));
+//			Logger.log("swapInt: " + reverseBytesFromInt(value));
 	        return reverseBytesFromInt(value);
 	    }
 	

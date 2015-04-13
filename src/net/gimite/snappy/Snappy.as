@@ -1,5 +1,6 @@
 package net.gimite.snappy
 {
+	import net.gimite.util.ByteArrayUtil;
 	import net.gimite.logger.Logger;
 	import flash.utils.ByteArray;
 	/**
@@ -68,12 +69,15 @@ package net.gimite.snappy
 //				Logger.log("CRC32_TABLE[" + i + "]: " + int(arr[i]).toString(16));
 //			}
 
-			Logger.log("original-string: " + data.toString());
+			Logger.info("ENTITY", data.toString());
+			Logger.info("ENTITY", ByteArrayUtil.toArrayString(data));
 			crc32.update(data, offset, length);
 			var value:int = crc32.getValue();
-			Logger.log("crc32.value: " + value.toString());
+			Logger.info("CRC32", value.toString());
+			Logger.info("CRC32", ByteArrayUtil.toByteString(value));
 			crc32.reset();
-			Logger.log("maskChecksum: " + (maskChecksum(value)).toString());
+			Logger.info("MASK_CHECKSUM", (maskChecksum(value)).toString());
+			Logger.info("MASK_CHECKSUM", ByteArrayUtil.toByteString(maskChecksum(value)));
             return maskChecksum(value);
 	    }
 	

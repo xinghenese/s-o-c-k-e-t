@@ -18,12 +18,7 @@ package net.gimite.snappy
 	    private var started:Boolean;
 	    private var corrupted:Boolean;
 	
-//	    public function SnappyFramedDecoder()
-//	    {
-//	        this(false);
-//	    }
-	
-	    public function SnappyFramedDecoder(validateChecksums:Boolean = false):void	//overload with default arguments assignment
+	    public function SnappyFramedDecoder(validateChecksums:Boolean = false):void
 	    {
 	        this.validateChecksums = validateChecksums;
 	    }
@@ -37,16 +32,12 @@ package net.gimite.snappy
 	     * @throws Exception
 	     *             if error occurred while decoding.
 	     */
-	    public function decode(bytesIn:ByteArray, bytesOut:Array):ByteArray// throws Exception
+	    public function decode(bytesIn:ByteArray, bytesOut:Array = null):ByteArray// throws Exception
 	    {
-			if(arguments.length == 1)
-			{
+			if(bytesOut){
 				return decodeBytes(bytesIn);
 			}
-			else if(arguments.length == 2)
-			{
-				decodeByteBuffer(InputByteBuffer(bytesIn), bytesOut);
-			}
+			return decodeByteBuffer(InputByteBuffer(bytesIn), bytesOut);
 	    }
 		
 		protected function decodeBytes(bytes:ByteArray):ByteArray

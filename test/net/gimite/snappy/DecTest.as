@@ -18,6 +18,8 @@ package net.gimite.snappy
 			
 			var str2:String = "1234567890123";
 			
+			Logger.info('unit', uint(10) & 0xFF);
+			
 			var a:ByteArray = Dec.toArray(str2);
 //			var b:BigInteger = new BigInteger(str);
 			var c:BigInteger = new BigInteger(a);

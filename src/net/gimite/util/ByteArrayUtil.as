@@ -10,13 +10,49 @@ package net.gimite.util
 	{
 		private static var base:int = 256;
 		
-		public static function createByteArray(big_endian:Boolean = true, value:* = null):ByteArray{
+		public static function createByteArray(big_endian:Boolean = true, value:* = null, bit:int = 0):ByteArray{
 			var bytes:ByteArray = new ByteArray();
 			if(!big_endian){
 				bytes.endian = Endian.LITTLE_ENDIAN;
-			}			
-			if(value && value is int){
-				bytes.writeInt(value);
+			}
+			if(value){
+				switch (true){
+					case (value is Boolean):
+						bytes.writeBoolean(value);
+						break;
+					case (value is uint):
+						bytes.writeUnsignedInt(value);
+						break;
+					case (value is int):
+						switch (bit){
+							case 1:
+								bytes.writeByte(value);
+								break;
+							case 2:
+								bytes.writeShort(value);
+								break;
+							default:
+								bytes.writeInt(value);
+								break;
+						}
+						break;
+					case (value is Number):
+						if(bit == 32){
+							bytes.writeFloat(value);					
+						}
+						else{
+							bytes.writeDouble(value);
+						}
+						break;
+					case (value is String):
+						bytes.writeUTFBytes(value);
+						break;
+					case (value is ByteArray):
+						bytes.writeBytes(value, 0, bit);
+						break;
+					default:
+						break;
+				}
 			}
 			return bytes;
 		}
@@ -94,6 +130,12 @@ package net.gimite.util
 			});
 			bytes.position = 0;
 			return bytes;
+		}
+		
+		public static function toByteString(value:*, radius:int = 10):String
+		{
+			var bytes:ByteArray = createByteArray(true, value);
+			return toArrayString(bytes);
 		}
 		
 		public static function toArrayString(bytes:ByteArray, radius:int = 10):String

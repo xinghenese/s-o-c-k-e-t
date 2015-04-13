@@ -1,5 +1,7 @@
 package net.gimite.snappy
 {
+	import com.hurlant.util.der.ByteString;
+	import net.gimite.logger.Logger;
 	import flash.utils.ByteArray;
 	/**
 	 * @author Administrator
@@ -43,6 +45,10 @@ package net.gimite.snappy
 //	        System.arraycopy(buf, 0, bytes, 0, index);
 //	        return bytes;
 	    }
+		
+		public function setByte(offset:int, value:int):void{
+			
+		}
 	
 	    public function setMedium(offset:int, value:int):void
 	    {
@@ -63,10 +69,18 @@ package net.gimite.snappy
 				position = offset;
 			}
 //			checkCapacity(size);
+			
+			Logger.log('bytes: ' + bytes);
+			var a:ByteArray = new ByteArray();
+			
 			for(var i:int = size - 1; i >= 0; i--)
 			{
-				writeByte((bytes >> i) & 0xFF);
+				writeByte((bytes >> (8*i)) & 0xFF);
+				a.writeByte((bytes >> (8*i)) & 0xFF);
 			}
+			
+			Logger.log('bytes: ' + Bytes.toArrayString(a));
+			
 			position = pos;
 		}
 	

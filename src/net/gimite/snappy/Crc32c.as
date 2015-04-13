@@ -61,7 +61,7 @@ package net.gimite.snappy
 	    //@Override
 	    public function update(buffer:ByteArray, offset:int, length:int):void
 	    {
-			Logger.log("crc_original: " + crc.toString());
+//			Logger.log("crc_original: " + crc.toString());
 			var arr_str:String = "[";
 	        for (var i:int = offset; i < offset + length; i++)
 	        {
@@ -70,7 +70,7 @@ package net.gimite.snappy
 				arr_str = arr_str + ", " + crc;
 	        }
 			arr_str = arr_str + "]";
-			Logger.log("str: " + arr_str);
+//			Logger.log("str: " + arr_str);
 //			Logger.log("crc: " + crc.toString(16));
 	    }
 	
