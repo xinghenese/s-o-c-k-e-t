@@ -1,0 +1,9 @@
+package socket;
+
+import com.mengdi.android.snappy.SnappyFramedDecoder;
+import com.mengdi.android.snappy.SnappyFramedEncoder;
+
+public class SnappySocket {
+	private SnappyFramedEncoder encoder;
+    private SnappyFramedDecoder decoder;
+}

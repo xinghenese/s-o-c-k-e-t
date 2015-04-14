@@ -1,0 +1,9 @@
+package socket;
+
+import snappy.SnappyFramedDecoder;
+import snappy.SnappyFramedEncoder;
+
+public class SnappySocket {
+	private SnappyFramedEncoder encoder;
+    private SnappyFramedDecoder decoder;
+}

@@ -1,0 +1,38 @@
+package socket;
+
+import java.util.Arrays;
+
+import com.mengdi.android.connection.socket.SockLog;
+
+import snappy.SnappyFramedDecoder;
+import snappy.SnappyFramedEncoder;
+
+public class SnappySocket 
+{
+	private SnappyFramedEncoder encoder;
+    private SnappyFramedDecoder decoder;
+    
+    public SnappySocket()
+    {
+    	
+    }
+    
+    public byte[] processIncomingBytes(byte[] bytes) throws Exception
+    {
+        byte[] decryptedBytes = super.processIncomingBytes(bytes);
+        return decoder.decode(decryptedBytes);
+    }
+
+    @Override
+    public byte[] processOutgoingBytes(byte[] bytes) throws Exception
+    {
+        byte[] data = encoder.encode(bytes);
+        if (data == null || data.length == 0)
+        {
+            SockLog.warn("invalid send data after zipped, raw bytes: " + Arrays.toString(bytes));
+            return super.processOutgoingBytes(data);
+        }
+
+        return super.processOutgoingBytes(data);
+    }
+}

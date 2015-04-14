@@ -1,0 +1,30 @@
+package socket;
+
+import java.util.Arrays;
+
+import com.mengdi.android.connection.socket.SockLog;
+
+import snappy.SnappyFramedDecoder;
+import snappy.SnappyFramedEncoder;
+
+public class SnappySocket 
+{
+	private SnappyFramedEncoder encoder;
+    private SnappyFramedDecoder decoder;
+    
+    public SnappySocket()
+    {
+    	encoder = new SnappyFramedEncoder();
+        decoder = new SnappyFramedDecoder();
+    }
+    
+    public byte[] processIncomingBytes(byte[] bytes) throws Exception
+    {
+        return decoder.decode(bytes);
+    }
+
+    public byte[] processOutgoingBytes(byte[] bytes) throws Exception
+    {
+        return encoder.encode(bytes);
+    }
+}
