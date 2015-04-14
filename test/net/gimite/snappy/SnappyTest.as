@@ -87,7 +87,7 @@ package net.gimite.snappy
 			{
 				bytes = new InputByteBuffer(bytes);
 			}
-			var _out:OutputByteBuffer = new OutputByteBuffer(), snappy:Snappy = new Snappy(), encoder:SnappyFrameEncoder = new SnappyFrameEncoder();
+			var _out:OutputByteBuffer = new OutputByteBuffer(), snappy:Snappy = new Snappy(), encoder:SnappyFrameEncoder = new SnappyFrameEncoder(), decoder:SnappyFrameDecoder = new SnappyFrameDecoder();
 			var out:ByteArray = encoder.encode(bytes);
 //			snappy.encode(InputByteBuffer(bytes), out);
 //			Logger.info("ouputString", out.toString());
@@ -96,6 +96,19 @@ package net.gimite.snappy
 
 			Logger.info('LENGTH', out.length);
 			Logger.info('LENGTH', ByteArrayUtil.toByteString(out.length));
+			
+			try{
+				
+			Logger.log('pass?outer');
+				Logger.info('decode', decoder.decode(out));
+				Logger.info('decode', ByteArrayUtil.toArrayString(decoder.decode(out)));
+			}
+			catch(e:Error){
+				Logger.log('error in snappyEncode');
+				Logger.error(e.name, e.message);
+				Logger.log(e.getStackTrace());
+			}
+			
 			
 			var header:ByteArray = new ByteArray();
 			header.writeInt(out.length);
@@ -115,7 +128,7 @@ package net.gimite.snappy
 				bytes = OutputByteBuffer.fromByteArray(bytes);
 			}
 			var out:OutputByteBuffer = new OutputByteBuffer(), snappy:Snappy = new Snappy();
-			snappy.encode(InputByteBuffer(bytes), out);
+			snappy.encode(bytes as InputByteBuffer, out);
 			return out;
 		}
 		

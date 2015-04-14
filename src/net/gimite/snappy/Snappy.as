@@ -512,7 +512,7 @@ package net.gimite.snappy
 	
 	        validateOffset(offset, writtenSoFar);
 	
-	        var inBuf:InputByteBuffer = InputByteBuffer(bytesOut.getBytes());
+	        var inBuf:InputByteBuffer = bytesOut.getBytes() as InputByteBuffer;
 	        // bytesOut.markReaderIndex();
 	        if (offset < length)
 	        {

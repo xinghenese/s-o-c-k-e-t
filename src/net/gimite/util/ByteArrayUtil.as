@@ -10,6 +10,8 @@ package net.gimite.util
 	{
 		private static var base:int = 256;
 		
+//		public static function createReadableBytes(big_endian:Boolean = true, value:* = null, bit:int = 0):ByteArray
+		
 		public static function createByteArray(big_endian:Boolean = true, value:* = null, bit:int = 0):ByteArray{
 			var bytes:ByteArray = new ByteArray();
 			if(!big_endian){
@@ -38,7 +40,7 @@ package net.gimite.util
 						break;
 					case (value is Number):
 						if(bit == 32){
-							bytes.writeFloat(value);					
+							bytes.writeFloat(value);
 						}
 						else{
 							bytes.writeDouble(value);
@@ -50,11 +52,43 @@ package net.gimite.util
 					case (value is ByteArray):
 						bytes.writeBytes(value, 0, bit);
 						break;
+					case (value is Array):
+						switch (bit){								
+							case 2:
+								value.forEach(function(item:*, index:int, arr:Array):void{
+									bytes.writeShort(int(item));
+								});
+								break;
+							case 4:
+								value.forEach(function(item:*, index:int, arr:Array):void{
+									bytes.writeInt(int(item));
+								});
+								break;
+							default:
+								value.forEach(function(item:*, index:int, arr:Array):void{
+									bytes.writeByte(int(item));
+								});
+								break;
+						}
+						break;
 					default:
 						break;
 				}
 			}
 			return bytes;
+		}
+		
+		public static function equals(bytes1:ByteArray, bytes2:ByteArray):Boolean
+		{
+			if(bytes1.length != bytes2.length){
+				return false;
+			}
+			for(var i:int = 0, len:int = bytes1.length; i<len; i++){
+				if(bytes1[i] != bytes2[i]){
+					return false;
+				}
+			}
+			return true;
 		}
 		
 		public static function addUpByteArrays(bytes1:ByteArray, bytes2:ByteArray):ByteArray

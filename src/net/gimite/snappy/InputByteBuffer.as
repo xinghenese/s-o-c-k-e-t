@@ -34,6 +34,11 @@ package net.gimite.snappy
 	    {
 			return getData(offset);
 	    }
+		
+		public function getShort(offset:int = -1):int
+		{
+			return getData(offset, readShort);
+		}
 	
 	    public function getInt(offset:int = -1):int
 	    {
@@ -47,7 +52,8 @@ package net.gimite.snappy
 	
 	    public function getUnsignedMedium(offset:int = -1):int
 	    {
-	        return uint(getInt(offset)) & 0xFFFFFF;
+			return uint((getShort(offset) << 8) | getByte(offset + 2)) & 0xFFFFFF;
+//	        return uint(getInt(offset)) & 0xFFFFFF;
 	    }
 		
 		private function getData(offset:int = -1, read:Function = null):int
@@ -58,7 +64,8 @@ package net.gimite.snappy
 				position = offset;
 			}
 			try{
-				var result:int = (read || readByte).call(this);
+				read = read || readByte;
+				var result:int = read();
 			}
 			catch(e:Error){
 				Logger.error(e.name, e.message);
@@ -84,7 +91,13 @@ package net.gimite.snappy
 	            throw new RangeError();
 	        }
 			var result:InputByteBuffer = new InputByteBuffer();
-			readBytes(result, position, length);
+			try{
+				readBytes(result, position, length);
+			}
+			catch(e:Error){
+				Logger.log('error when readBytes');
+				Logger.error(e.name, e.message);
+			}
 //	        var result:InputByteBuffer = Array.prototype.slice.call(this, position, position = position + length); //Array.prototype.slice in AS acts as if Arrays.copyOfRange in Java
 //	        return result;
 			return result;

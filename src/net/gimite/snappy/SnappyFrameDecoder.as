@@ -1,5 +1,7 @@
 package net.gimite.snappy
 {
+	import net.gimite.util.ByteArrayUtil;
+	import net.gimite.logger.Logger;
 	import flash.utils.ByteArray;
 	/**
 	 * @author Administrator
@@ -15,41 +17,37 @@ package net.gimite.snappy
 		
 	    private const snappy:Snappy = new Snappy();
 	    private var validateChecksums:Boolean;
-	    private var started:Boolean;
+	    private var started:Boolean = false;
 	    private var corrupted:Boolean;
 	
 	    public function SnappyFramedDecoder(validateChecksums:Boolean = false):void
 	    {
 	        this.validateChecksums = validateChecksums;
 	    }
-	
-	    /**
-	     * Decodes the snappy encoded bytes.
-	     * 
-	     * @param bytes
-	     *            the encoded bytes.
-	     * @return the chunks of decoded bytes, never return null.
-	     * @throws Exception
-	     *             if error occurred while decoding.
-	     */
-	    public function decode(bytesIn:ByteArray, bytesOut:Array = null):ByteArray// throws Exception
-	    {
-			if(bytesOut){
-				return decodeBytes(bytesIn);
-			}
-			return decodeByteBuffer(InputByteBuffer(bytesIn), bytesOut);
-	    }
 		
-		protected function decodeBytes(bytes:ByteArray):ByteArray
+		public function decode(bytes:ByteArray):ByteArray
 		{
-			var bytesIn:ByteArray = bytes;
-			var bytesOut:Array = new Array();
+			var bytesIn:InputByteBuffer = new InputByteBuffer(bytes);
+			var bytesOut:Vector.<ByteArray> = new Vector.<ByteArray>();
+			Logger.log('pass?inner');
+			
+			Logger.log(bytesIn);
 			
 			while(bytesIn.bytesAvailable)
 			{
 				var outSize:int = bytesOut.length;
 				var oldInputLength:int = bytesIn.bytesAvailable;
-				decodeByteBuffer(InputByteBuffer(bytesIn), bytesOut);
+				Logger.info('oldInputLength', oldInputLength);
+				Logger.info('started', started);
+				
+				try{
+					decodeByteBuffer(bytesIn, bytesOut);
+				}
+				catch(e:Error){
+					Logger.log('error in decodeByteBuffer');
+					Logger.error(e.name, e.message);	
+					Logger.log(e.getStackTrace());
+				}
 				
 				if(outSize == bytesOut.length)
 				{
@@ -65,20 +63,18 @@ package net.gimite.snappy
 				
 				if(oldInputLength == bytesIn.bytesAvailable)
 				{
-					throw new SnappyException();
+					throw new SnappyException(".decode() did not read anything but decoded a message.");
 				}
 			}
 			
-			var len:int = 0;
-			for (var _each:ByteArray in bytesOut)
-	        {
-	            len += _each.length;
-	        }
+//			var len:int = 0;
+//			bytesOut.forEach(function(item:ByteArray, index:int, vector:Vector.<ByteArray>):void{
+//				len += item.length;
+//			});
 	        var buf:OutputByteBuffer = new OutputByteBuffer();
-	        for (_each in bytesOut)
-	        {
-	            buf.writeBytes(_each);
-	        }
+			bytesOut.forEach(function(item:ByteArray, index:int, vector:Vector.<ByteArray>):void{
+				buf.writeBytes(item);
+			});
 	        return buf.getBytes();
 			
 //			var bytesIn:InputByteBuffer = new InputByteBuffer(bytes);
@@ -122,9 +118,9 @@ package net.gimite.snappy
 //	        return buf.getBytes();
 		}
 	
-	    protected function decodeByteBuffer(bytesIn:InputByteBuffer, bytesOut:Array):ByteArray	//List<ByteArray> to Array// throws Exception
+	    protected function decodeByteBuffer(bytesIn:InputByteBuffer, bytesOut:Vector.<ByteArray>):void	//List<ByteArray> to Array// throws Exception
 	    {
-	        if (corrupted)
+			if (corrupted)
 	        {
 	            bytesIn.skipBytes(bytesIn.bytesAvailable);
 	            return;
@@ -133,7 +129,9 @@ package net.gimite.snappy
 	        try
 	        {
 	            var pos:int = bytesIn.position;
+				Logger.log('pos: ' + pos);
 	            const inSize:int = bytesIn.bytesAvailable;
+				Logger.log('inSize: ' + inSize);
 	            if (inSize < 4)
 	            {
 	                // We need to be at least able to read the chunk type identifier
@@ -141,10 +139,22 @@ package net.gimite.snappy
 	                // and the length of the chunk (3 bytes) in order to proceed
 	                return;
 	            }
+				
+				Logger.info('bytesIn', ByteArrayUtil.toArrayString(bytesIn));
 	
-	            const chunkTypeVal:uint = bytesIn.readUnsignedByte();
-	            const chunkType:ChunkType = ChunkType.mapChunkType(chunkTypeVal);
+				//一条报文根据内容的功能类型分割成若干个数据块chunk。每个chunk的第一个字节表示chunk的类型，接着后三个字节表示chunk的长度(需作swapMedium处理),
+				//这样可以根据不同chunk类型作不同处理，并且根据后三个字节所表示的chunk长度来分配一定大小的ouputbuffer，然后将一边处理chunk内容，
+				//一边将处理后的内容写到ouputbuffer中
+	            const chunkTypeVal:uint = bytesIn.getUnsignedByte();
+	            const chunkType:int = ChunkType.mapChunkType(chunkTypeVal);
 	            const chunkLength:int = Bytes.swapMedium(bytesIn.getUnsignedMedium(pos + 1));
+				
+				Logger.info('bytesIn.getUnsignedMedium', bytesIn.getUnsignedMedium(pos + 1));
+				
+				Logger.info('chunkTypeVal', chunkTypeVal);
+				Logger.info('chunkType', chunkType);
+				Logger.info('chunkLength', chunkLength);
+				Logger.info('started', started);
 	
 	            switch (chunkType)
 	            {
@@ -160,7 +170,10 @@ package net.gimite.snappy
 	                    }
 	
 	                    var identifier:ByteArray = new ByteArray();//new byte[chunkLength];
-	                    bytesIn.skipBytes(4).readBytes(identifier);
+	                    Logger.info('pos', bytesIn.position);
+	                    bytesIn.skipBytes(4).readBytes(identifier, 0, chunkLength);
+						
+						Logger.info('identifier', ByteArrayUtil.toArrayString(identifier));
 	
 	                    if (!Arrays.equals(identifier, SNAPPY))
 	                    {
@@ -220,6 +233,7 @@ package net.gimite.snappy
 	                    bytesOut.push(bytesIn.readSlice(chunkLength - 4));
 	                    break;
 	                case ChunkType.COMPRESSED_DATA:
+						Logger.log('COMPRESSED_DATA');
 	                    if (!started)
 	                    {
 	                        throw new SnappyException("Received COMPRESSED_DATA tag before STREAM_IDENTIFIER");
@@ -232,27 +246,34 @@ package net.gimite.snappy
 	
 	                    bytesIn.skipBytes(4);
 	                    checksum = Bytes.swapInt(bytesIn.readInt());
+						
+						Logger.info('checksum', checksum);
+						Logger.info('validateChecksums', validateChecksums);
+						Logger.info('pos', bytesIn.position);
+						Logger.info('chunk', ByteArrayUtil.toByteString(bytesIn.getInt()));
+						
 	                    var uncompressed:OutputByteBuffer = new OutputByteBuffer();
 	                    snappy.decode(bytesIn.readSlice(chunkLength - 4), uncompressed);
 	                    if (validateChecksums)
 	                    {
-	                        var inUncompressed:InputByteBuffer = InputByteBuffer(uncompressed);
+	                        var inUncompressed:InputByteBuffer = uncompressed as InputByteBuffer;
 	                        Snappy.validateChecksum(checksum, inUncompressed, 0, uncompressed.position);
 	                    }
+						
+						Logger.info('uncompressed', ByteArrayUtil.toArrayString(uncompressed));
+						
 	                    bytesOut.push(uncompressed.getBytes());
 	                    snappy.reset();
 	                    break;
 	            }
 	        }
-	        catch (e)
+	        catch (e:Error)
 	        {
+				Logger.log('corrupted...');
 	            corrupted = true;
 	            throw e;
 	        }
 	    }
-	
-	    
-	
 	    
 	}
 }

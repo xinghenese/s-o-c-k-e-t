@@ -15,7 +15,7 @@ package net.gimite.snappy
 	public class FlashSocketTest extends Sprite
 	{
 		private var host:Array = ["192.168.0.110", "192.168.1.66", "192.168.1.67", "192.168.1.68"];
-		private var ordinal:int = 0;
+		private var ordinal:int = 1;
 		private var socket:FlashSocket;
 		
 		public function FlashSocketTest():void

@@ -7,11 +7,11 @@ package net.gimite.snappy
 	{
 		private var value:int;
 		
-		public static const STREAM_IDENTIFIER:ChunkType = new ChunkType(0);
-		public static const COMPRESSED_DATA:ChunkType = new ChunkType(1);
-		public static const UNCOMPRESSED_DATA:ChunkType = new ChunkType(2);
-		public static const RESERVED_UNSKIPPABLE:ChunkType = new ChunkType(3);
-		public static const RESERVED_SKIPPABLE:ChunkType = new ChunkType(4);
+		public static const STREAM_IDENTIFIER:int = 0;
+		public static const COMPRESSED_DATA:int = 1;
+		public static const UNCOMPRESSED_DATA:int = 2;
+		public static const RESERVED_UNSKIPPABLE:int = 3;
+		public static const RESERVED_SKIPPABLE:int = 4;
 		
 		public function ChunkType(value:int)
 		{
@@ -26,7 +26,7 @@ package net.gimite.snappy
 	     * @return The appropriate {@link ChunkType}, defaulting to
 	     *         {@link ChunkType#RESERVED_UNSKIPPABLE}
 	     */
-	    public static function mapChunkType(type:int):ChunkType //byte to int ChunkType to int
+	    public static function mapChunkType(type:int):int //byte to int ChunkType to int
 	    {
 			type = Bytes.toByte(type);
 	        if (type == 0)

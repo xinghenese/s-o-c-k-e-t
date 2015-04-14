@@ -1,5 +1,6 @@
 package net.gimite.snappy
 {
+	import net.gimite.util.ByteArrayUtil;
 	import net.gimite.logger.Logger;
 	import flash.utils.ByteArray;
 	/**
@@ -126,7 +127,9 @@ package net.gimite.snappy
 	        {
 	            throw new SnappyException("compressed data too large: " + chunkLength);
 	        }
-	        bytesOut.setMedium(lengthIdx - 1, Bytes.swapMedium(chunkLength));
+			Logger.info('before-bytesOut', ByteArrayUtil.toArrayString(bytesOut));
+	        bytesOut.setMedium(lengthIdx, Bytes.swapMedium(chunkLength));
+			Logger.info('after-bytesOut', ByteArrayUtil.toArrayString(bytesOut));
 	    }
 	
 	    /**
