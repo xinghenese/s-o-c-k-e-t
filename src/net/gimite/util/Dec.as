@@ -20,7 +20,7 @@ package net.gimite.util
 				return new ByteArray();
 			}
 			
-			Logger.log('extra: ' + extra);
+//			Logger.log('extra: ' + extra);
 			
 			var result:ByteArray = ByteArrayUtil.createByteArray(false);
 			
@@ -32,16 +32,24 @@ package net.gimite.util
 				pos = Math.max(pos - split, 0);
 				
 				//Checked
-				var _bytes:ByteArray = ByteArrayUtil.createByteArray(false, int(dec.substring(pos, last_pos)));
+				var _bytes:ByteArray = ByteArrayUtil.createByteArray(false, parseInt(dec.substring(pos, last_pos)));
 				Logger.log(dec.substring(pos, last_pos));
-				Logger.info('_bytes', ByteArrayUtil.toArrayString(_bytes));				
-				Logger.info('cal', fromArray(_bytes));
+//				Logger.info('_bytes', ByteArrayUtil.toArrayString(_bytes));				
+//				Logger.info('cal', fromArray(_bytes));
 				//
 				
-				var bytes:ByteArray = ByteArrayUtil.mutiplyByteArrays(_bytes, extra_bytes);	
-				Logger.info('bytes', ByteArrayUtil.toArrayString(bytes));
-				Logger.info('num      ', fromArray(bytes));
-				Logger.info('right-num', int(dec.substring(pos, last_pos))*extra);
+				var bytes:ByteArray = i > 0 ? ByteArrayUtil.mutiplyByteArrays(_bytes, extra_bytes) : _bytes;
+				
+//				if(i==1){
+					Logger.info('original' + i, ByteArrayUtil.toArrayString(_bytes, true, 16));
+					Logger.info('times', ByteArrayUtil.toArrayString(extra_bytes, true, 16));
+					Logger.info('multiply' + i, ByteArrayUtil.toArrayString(bytes, true, 16));
+//				}
+				
+				
+//				Logger.info('bytes', ByteArrayUtil.toArrayString(bytes));
+//				Logger.info('num      ', fromArray(bytes));
+//				Logger.info('right-num', int(dec.substring(pos, last_pos))*extra);
 
 				for(var j:int = 0, len:int = ByteArrayUtil.getSignificantLength(bytes); j<len; j++){
 					//进位
@@ -51,8 +59,8 @@ package net.gimite.util
 				
 			}while(pos>0);
 			
-			Logger.log('dec-array: ' + ByteArrayUtil.toArrayString(result));
-			Logger.log('endian: ' + result.endian);
+//			Logger.log('dec-array: ' + ByteArrayUtil.toArrayString(result));
+//			Logger.log('endian: ' + result.endian);
 			
 			return result;
 		}
@@ -63,7 +71,7 @@ package net.gimite.util
 			}
 			var sum:int = 0;
 			
-			if(little_endian){
+			if(arr is ByteArray && arr.endian == Endian.LITTLE_ENDIAN || arr is Array && little_endian){
 				for(var i:int = arr.length - 1; i>=0; i--){
 					sum = sum * base + arr[i];
 				}

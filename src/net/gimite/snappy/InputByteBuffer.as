@@ -92,7 +92,7 @@ package net.gimite.snappy
 	        }
 			var result:InputByteBuffer = new InputByteBuffer();
 			try{
-				readBytes(result, position, length);
+				readBytes(result, 0, length);
 			}
 			catch(e:Error){
 				Logger.log('error when readBytes');

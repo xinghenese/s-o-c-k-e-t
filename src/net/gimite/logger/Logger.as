@@ -55,7 +55,19 @@ package net.gimite.logger
 		public static var log : Function = callLog("log");
 		public static var info : Function = callLog("info");
 		public static var warn : Function = callLog("warn");
-		public static var error : Function = callLog("error");
+		public static var error: Function = (function():Function{
+			var _error:Function = callLog("error");
+			return function(err:*, msg:String = ''):void{
+				if(err is Error){
+					msg = err.message;
+					err = err.name;
+				}
+				else{
+					err = err.toString();
+				}
+				_error(err, msg);
+			};
+		})();
 
 	}
 }

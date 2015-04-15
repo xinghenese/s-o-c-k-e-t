@@ -57,8 +57,8 @@ package net.gimite.snappy
 	        {
 	            started = true;
 	            bytesOut.writeBytes(STREAM_START);
-				Logger.info("STREAM_START", STREAM_START);
-				Logger.info("STREAM_START", Bytes.toArrayString(STREAM_START));
+//				Logger.info("STREAM_START", STREAM_START);
+//				Logger.info("STREAM_START", Bytes.toArrayString(STREAM_START));
 	        }
 	
 	        var dataLength:int = bytesIn.bytesAvailable;
@@ -122,14 +122,14 @@ package net.gimite.snappy
 	    private static function setChunkLength(bytesOut:OutputByteBuffer, lengthIdx:int):void
 	    {
 	        var chunkLength:int = bytesOut.position - lengthIdx - 3;
-			Logger.log('chunkLength: ' + chunkLength);
+//			Logger.log('chunkLength: ' + chunkLength);
 	        if (chunkLength >>> 24 != 0)
 	        {
 	            throw new SnappyException("compressed data too large: " + chunkLength);
 	        }
-			Logger.info('before-bytesOut', ByteArrayUtil.toArrayString(bytesOut));
+//			Logger.info('before-bytesOut', ByteArrayUtil.toArrayString(bytesOut));
 	        bytesOut.setMedium(lengthIdx, Bytes.swapMedium(chunkLength));
-			Logger.info('after-bytesOut', ByteArrayUtil.toArrayString(bytesOut));
+//			Logger.info('after-bytesOut', ByteArrayUtil.toArrayString(bytesOut));
 	    }
 	
 	    /**

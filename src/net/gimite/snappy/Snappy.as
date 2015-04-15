@@ -22,7 +22,7 @@ package net.gimite.snappy
 	    private static const COPY_2_BYTE_OFFSET:int = 2;
 	    private static const COPY_4_BYTE_OFFSET:int = 3;
 	
-	    private var state:State = State.READY;
+	    private var state:int = State.READY;
 	    private var tag:int; //byte to int
 	    private var written:int;
 	
@@ -69,15 +69,15 @@ package net.gimite.snappy
 //				Logger.log("CRC32_TABLE[" + i + "]: " + int(arr[i]).toString(16));
 //			}
 
-			Logger.info("ENTITY", data.toString());
-			Logger.info("ENTITY", ByteArrayUtil.toArrayString(data));
+//			Logger.info("ENTITY", data.toString());
+//			Logger.info("ENTITY", ByteArrayUtil.toArrayString(data));
 			crc32.update(data, offset, length);
 			var value:int = crc32.getValue();
-			Logger.info("CRC32", value.toString());
-			Logger.info("CRC32", ByteArrayUtil.toByteString(value));
+//			Logger.info("CRC32", value.toString());
+//			Logger.info("CRC32", ByteArrayUtil.toByteString(value));
 			crc32.reset();
-			Logger.info("MASK_CHECKSUM", (maskChecksum(value)).toString());
-			Logger.info("MASK_CHECKSUM", ByteArrayUtil.toByteString(maskChecksum(value)));
+//			Logger.info("MASK_CHECKSUM", (maskChecksum(value)).toString());
+//			Logger.info("MASK_CHECKSUM", ByteArrayUtil.toByteString(maskChecksum(value)));
             return maskChecksum(value);
 	    }
 	
@@ -91,14 +91,19 @@ package net.gimite.snappy
 	
 	    public function decode(bytesIn:InputByteBuffer, bytesOut:OutputByteBuffer):void
 	    {
+//			Logger.log('snappy decoding starts');
+//			Logger.info('bytesIn', ByteArrayUtil.toArrayString(bytesIn));
 	        while (bytesIn.isReadable())
 	        {
 	            switch (state)
 	            {
 	                case State.READY:
+//						Logger.info('state', State.getState(state));
 	                    state = State.READING_PREAMBLE;
-	                case State.READING_PREAMBLE:
+	                case State.READING_PREAMBLE:					
+//						Logger.info('state', State.getState(state));
 	                    var uncompressedLength:int = readPreamble(bytesIn);
+//						Logger.info('uncompressedLength', uncompressedLength);
 	                    if (uncompressedLength == PREAMBLE_NOT_FULL)
 	                    {
 	                        // We've not yet read all of the preamble, so wait until
@@ -115,6 +120,7 @@ package net.gimite.snappy
 	                    bytesOut.ensureWritable(uncompressedLength);
 	                    state = State.READING_TAG;
 	                case State.READING_TAG:
+//						Logger.info('state', State.getState(state));
 	                    if (!bytesIn.isReadable())
 	                    {
 	                        return;
@@ -133,6 +139,7 @@ package net.gimite.snappy
 	                    }
 	                    break;
 	                case State.READING_LITERAL:
+//						Logger.info('state', State.getState(state));
 	                    var literalWritten:int = decodeLiteral(tag, bytesIn, bytesOut);
 	                    if (literalWritten != NOT_ENOUGH_INPUT)
 	                    {
@@ -146,6 +153,7 @@ package net.gimite.snappy
 	                    }
 	                    break;
 	                case State.READING_COPY:
+//						Logger.info('state', State.getState(state));
 	                    var decodeWritten:int;
 	                    switch (tag & 0x03)
 	                    {
@@ -780,9 +788,11 @@ package net.gimite.snappy
 	    {
 	        var length:int = 0;
 	        var byteIndex:int = 0;
-	        while (bytesIn.isReadable())
+	        while (bytesIn.bytesAvailable)
 	        {
+//				Logger.info('bytesIn', ByteArrayUtil.toArrayString(bytesIn, false));
 	            var current:int = bytesIn.readUnsignedByte();
+//				Logger.info('current', current);
 	            length |= (current & 0x7f) << byteIndex++ * 7;
 	            if ((current & 0x80) == 0)
 	            {

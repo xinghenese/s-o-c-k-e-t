@@ -16,61 +16,42 @@ package net.gimite.snappy
 					
 			var str:String = "171718397966129586011229151993178480901904202533705695869569760169920539808075437788747086722975900425740754301098468647941395164593810074170462799608062493021989285837416815548721035874378548121236050948528229416139585571568998066586304075565145536350296006867635076744949977849997684222020336013226588207303";
 			
-			var str2:String = "1234567890123";
+			Logger.log(str.length);
 			
-			Logger.info('unit', uint(10) & 0xFF);
+//			var str2:String = "1234567890123";
+			var str2:String = "1234567890";
 			
-			var a:ByteArray = Dec.toArray(str2);
-//			var b:BigInteger = new BigInteger(str);
-			var c:BigInteger = new BigInteger(a);
-//			var d:BigInteger = new BigInteger('100');
+//			Logger.info('str2', parseInt(str2));
+//			Logger.info('str2', ByteArrayUtil.toByteString(parseInt(str2)));
+//			Logger.info('str2', ByteArrayUtil.toArrayString(Dec.toArray(str2)));
 			
-			Logger.log("AAA: " + str);
-			Logger.info('a', ByteArrayUtil.toArrayString(a));
-//			Logger.log("b: " + b.toString());
-			Logger.log("c: " + c.toString(10));
-//			Logger.log("d: " + d.toString(10));
+			var int1:int = 0x12345678;
+//			var int1:int = 0x1234;
+			var bts_int1:ByteArray = ByteArrayUtil.createByteArray(false, int1);
+//			Logger.info('int1', int1.toString());
+//			Logger.info('0x-int1', int1.toString(16));
+//			Logger.info('bts_int1', ByteArrayUtil.toArrayString(bts_int1, true, 16));
 			
-			var num:String = '1234567890123';
-			Logger.log('num: ' + num);
+			var times:int = Math.pow(5, 8);
+			var bts_times:ByteArray = ByteArrayUtil.createByteArray(false, times);
+//			Logger.info('times', times.toString());
+//			Logger.info('0x-times', times.toString(16));
+//			Logger.info('bts_times', ByteArrayUtil.toArrayString(bts_times, true, 16));
+			var result:ByteArray = Dec.toArray(str);
+			Logger.info('result', ByteArrayUtil.toArrayString(result, true, 16));
+			Logger.info('length', result.length);
+//			
+//			Logger.log('cache?');
+
+//			var int3:int = 60132265;
+//			var bts_int3:ByteArray = ByteArrayUtil.createByteArray(false, int3);
+//			Logger.info('int3', int3);
+//			Logger.info('bts_int3', ByteArrayUtil.toArrayString(bts_int3, true, 16));
+//			Logger.info('bts_times', ByteArrayUtil.toArrayString(bts_times, true, 16));
+//			var mutiply3:ByteArray = ByteArrayUtil.mutiplyByteArrays(bts_int3, bts_times);
+//			Logger.info('mutiply3', ByteArrayUtil.toArrayString(mutiply3, true, 16));
 			
-			var toarr:Array = toArray(num);
-			
-			var intBaseExtra:uint = Math.pow(10, 8) + 2;
-			var arrBaseExtra:Array = Dec.simpleToArray(intBaseExtra);
-			Logger.log('base_extra: 5^8');
-			Logger.info('base_extra', intBaseExtra);
-			Logger.info('simpleToArray', arrBaseExtra);
-			Logger.info('sumToCheck', Dec.fromArray(arrBaseExtra));
-			
-			var bytes:ByteArray = new ByteArray();
-			bytes.endian = Endian.LITTLE_ENDIAN;
-			bytes.writeInt(intBaseExtra);
-			Logger.info('bytes', ByteArrayUtil.toArrayString(bytes));
-			
-			var bytes1:ByteArray = new ByteArray();
-			bytes1.endian = Endian.LITTLE_ENDIAN;
-			bytes1.writeInt(toarr[1]);
-			Logger.info('bytes1', ByteArrayUtil.toArrayString(bytes1));
-			
-			var bytes2:ByteArray = ByteArrayUtil.mutiplyByteArrays(bytes, bytes1);
-			Logger.info('mutiply-arr', ByteArrayUtil.toArrayString(bytes2));
-			bytes2.position = 0;
-			try{
-				while(bytes2.bytesAvailable > 0){
-					Logger.info('mutiply-num', bytes2.readInt());
-				}				
-			}
-			catch(e:Error){
-				
-			}			
-			
-			var bytes3:ByteArray = new ByteArray();
-			bytes3.endian = Endian.LITTLE_ENDIAN;
-			bytes3.writeInt(intBaseExtra * toarr[1]);
-			Logger.info('bytes', ByteArrayUtil.toArrayString(bytes3));
-			Logger.info('num', Dec.fromArray(bytes3));
-			
+						
 		}
 		
 		public function toArray(dec:String):Array{

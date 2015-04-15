@@ -94,19 +94,20 @@ package net.gimite.snappy
 //			Logger.info("outputArray", Bytes.toArrayString(out));
 //			Logger.info("length", out.length);
 
-			Logger.info('LENGTH', out.length);
-			Logger.info('LENGTH', ByteArrayUtil.toByteString(out.length));
+//			Logger.info('LENGTH', out.length);
+//			Logger.info('LENGTH', ByteArrayUtil.toByteString(out.length));
 			
 			try{
 				
-			Logger.log('pass?outer');
-				Logger.info('decode', decoder.decode(out));
-				Logger.info('decode', ByteArrayUtil.toArrayString(decoder.decode(out)));
+				var decoded:ByteArray = decoder.decode(out);
+//			Logger.log('pass?outer');
+				Logger.info('decode', decoded);
+				Logger.info('decode', ByteArrayUtil.toArrayString(decoded));
 			}
 			catch(e:Error){
-				Logger.log('error in snappyEncode');
-				Logger.error(e.name, e.message);
-				Logger.log(e.getStackTrace());
+//				Logger.log('error in snappyEncode');
+//				Logger.error(e.name, e.message);
+//				Logger.log(e.getStackTrace());
 			}
 			
 			
