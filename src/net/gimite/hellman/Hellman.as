@@ -1,5 +1,10 @@
 package net.gimite.hellman
 {
+	import com.hurlant.util.Base64;
+	import com.hurlant.crypto.prng.ARC4;
+	import net.gimite.logger.Logger;
+	import com.adobe.crypto.MD5;
+	import mx.utils.Base64Encoder;
 	import flash.utils.ByteArray;
 	import com.hurlant.math.BigInteger;
 	/**
@@ -51,8 +56,7 @@ package net.gimite.hellman
 	
 	    public function  getPublicKey():String
 	    {
-			//problem
-			return '';
+			return Base64.encodeByteArray(createPub().toByteArray());
 //	        return RC4Encrypt.get().base64Encode(createPub().toByteArray());
 	    }
 	
@@ -70,20 +74,17 @@ package net.gimite.hellman
 	
 	    public function  getRCKey(publicKey:ByteArray):String
 	    {
-//	        try
-//	        {
-//				problem
-//	            var bigIntegerWrap:BigInteger = new BigInteger(1, publicKey);
-//	            var bitIntSecretKey:BigInteger = getShared(bigIntegerWrap);
-//	            var result:ByteArray = Base64Util.base64Encrypt(bitIntSecretKey.toByteArray());
-//	            var secret: String = new String(result);
-//	            return MD5Util.md5Encrypt(secret);
-//	        }
-//	        catch (e:Exception)
-//	        {
-//	            Logger.logThrowable(e);
-//	        }
-//	
+	        try
+	        {
+	            var bigIntegerWrap:BigInteger = new BigInteger(publicKey, 16, true);
+	            var bitIntSecretKey:BigInteger = getShared(bigIntegerWrap);
+	            return MD5.hash(Base64.encodeByteArray(bitIntSecretKey.toByteArray()));
+	        }
+	        catch (e:Error)
+	        {
+	            Logger.error(e);
+	        }
+	
 	        return null;
 	    }
 	}

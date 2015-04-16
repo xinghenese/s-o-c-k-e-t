@@ -4,12 +4,12 @@ package net.gimite.flashsocket
 	/**
 	 * @author Administrator
 	 */
-	public interface SocketListener
+	internal interface SocketListener
 	{
-		function closeHandler(e:Event):void;
-		function connectHandler(e:Event):void;
-		function ioErrorHandler(e:Event):void;
-		function securityErrorHandler(e:Event):void;
-		function socketDataHandler(e:Event):void;
+		function handleClose(e:Event):void;
+		function handleConnect(e:Event):void;
+		function handleIOError(e:Event):void;
+		function handleSecurityError(e:Event):void;
+		function handleSocketData(e:Event):void;
 	}
 }

@@ -99,7 +99,8 @@ package net.gimite.snappy
 			
 			try{
 				
-				var decoded:ByteArray = decoder.decode(out);
+				var undecoded:Array = [255, 6, 0, 0, 115, 78, 97, 80, 112, 89, 0, 198, 0, 0, 145, 82, 130, 162, 190, 1, 240, 189, 60, 72, 83, 75, 32, 112, 98, 107, 61, 34, 65, 80, 79, 116, 51, 90, 114, 112, 52, 75, 43, 122, 103, 104, 77, 101, 112, 56, 90, 84, 111, 100, 97, 43, 103, 55, 100, 51, 122, 57, 97, 109, 103, 65, 119, 66, 84, 47, 77, 120, 110, 56, 76, 57, 65, 100, 76, 73, 107, 89, 101, 122, 101, 74, 103, 89, 68, 104, 50, 51, 86, 47, 85, 118, 65, 69, 74, 80, 56, 88, 70, 115, 55, 83, 107, 43, 87, 109, 116, 69, 110, 114, 121, 51, 103, 48, 89, 66, 72, 122, 89, 113, 53, 90, 118, 55, 112, 119, 49, 120, 122, 67, 70, 73, 66, 67, 109, 88, 68, 43, 73, 73, 56, 55, 43, 107, 85, 117, 80, 49, 54, 53, 84, 76, 65, 118, 90, 81, 57, 110, 70, 105, 68, 87, 88, 120, 74, 107, 88, 48, 115, 85, 105, 55, 121, 56, 65, 114, 65, 53, 81, 51, 56, 105, 49, 121, 50, 117, 52, 86, 73, 112, 56, 76, 68, 57, 43, 84, 57, 75, 54, 84, 34, 62, 60, 47, 72, 83, 75, 62];
+				var decoded:ByteArray = decoder.decode(ByteArrayUtil.createByteArray(true, undecoded));
 //			Logger.log('pass?outer');
 				Logger.info('decode', decoded);
 				Logger.info('decode', ByteArrayUtil.toArrayString(decoded));
@@ -131,6 +132,27 @@ package net.gimite.snappy
 			var out:OutputByteBuffer = new OutputByteBuffer(), snappy:Snappy = new Snappy();
 			snappy.encode(bytes as InputByteBuffer, out);
 			return out;
+		}
+		
+		public static function decodeTest():void
+		{
+			try{
+				var decoder:SnappyFrameDecoder = new SnappyFrameDecoder();
+			
+				var undecoded:Array = [255, 6, 0, 0, 115, 78, 97, 80, 112, 89, 0, 198, 0, 0, 145, 82, 130, 162, 190, 1, 240, 189, 60, 72, 83, 75, 32, 112, 98, 107, 61, 34, 65, 80, 79, 116, 51, 90, 114, 112, 52, 75, 43, 122, 103, 104, 77, 101, 112, 56, 90, 84, 111, 100, 97, 43, 103, 55, 100, 51, 122, 57, 97, 109, 103, 65, 119, 66, 84, 47, 77, 120, 110, 56, 76, 57, 65, 100, 76, 73, 107, 89, 101, 122, 101, 74, 103, 89, 68, 104, 50, 51, 86, 47, 85, 118, 65, 69, 74, 80, 56, 88, 70, 115, 55, 83, 107, 43, 87, 109, 116, 69, 110, 114, 121, 51, 103, 48, 89, 66, 72, 122, 89, 113, 53, 90, 118, 55, 112, 119, 49, 120, 122, 67, 70, 73, 66, 67, 109, 88, 68, 43, 73, 73, 56, 55, 43, 107, 85, 117, 80, 49, 54, 53, 84, 76, 65, 118, 90, 81, 57, 110, 70, 105, 68, 87, 88, 120, 74, 107, 88, 48, 115, 85, 105, 55, 121, 56, 65, 114, 65, 53, 81, 51, 56, 105, 49, 121, 50, 117, 52, 86, 73, 112, 56, 76, 68, 57, 43, 84, 57, 75, 54, 84, 34, 62, 60, 47, 72, 83, 75, 62];
+				var bytes:ByteArray = ByteArrayUtil.createByteArray(true, undecoded);
+				var decoded:ByteArray = decoder.decode(bytes);
+//			Logger.log('pass?outer');
+				Logger.info('undecode', bytes);
+				Logger.info('undecode', ByteArrayUtil.toArrayString(bytes));
+				Logger.info('decode', decoded);
+				Logger.info('decode', ByteArrayUtil.toArrayString(decoded));
+			}
+			catch(e:Error){
+//				Logger.log('error in snappyEncode');
+//				Logger.error(e.name, e.message);
+//				Logger.log(e.getStackTrace());
+			}
 		}
 		
 		public function SnappyTest()

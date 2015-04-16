@@ -1,5 +1,6 @@
 package net.gimite.flashsocket
 {
+	import net.gimite.util.ByteArrayUtil;
 	import net.gimite.snappy.Bytes;
 	import flash.utils.ByteArray;
 	import net.gimite.snappy.SnappyTest;
@@ -14,8 +15,8 @@ package net.gimite.flashsocket
 	 * @author Administrator
 	 */
 	public class FlashSocket extends Socket implements SocketListener
-	{
-		public function FlashSocket(host:String = null, port:uint = 80):void
+	{		
+		public function FlashSocket(host:String, port:uint):void
 		{
 			super();
 			configureListeners();
@@ -28,11 +29,11 @@ package net.gimite.flashsocket
 		
 		private function configureListeners():void
 		{
-			addEventListener(Event.CLOSE, closeHandler);
-	        addEventListener(Event.CONNECT, connectHandler);
-	        addEventListener(IOErrorEvent.IO_ERROR, ioErrorHandler);
-	        addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);
-	        addEventListener(ProgressEvent.SOCKET_DATA, socketDataHandler);
+			addEventListener(Event.CLOSE, handleClose);
+	        addEventListener(Event.CONNECT, handleConnect);
+	        addEventListener(IOErrorEvent.IO_ERROR, handleIOError);
+	        addEventListener(SecurityErrorEvent.SECURITY_ERROR, handleSecurityError);
+	        addEventListener(ProgressEvent.SOCKET_DATA, handleSocketData);
 			
 		}
 		
@@ -43,34 +44,50 @@ package net.gimite.flashsocket
 			Security.loadPolicyFile(policyUrl);
 		}		
 		
-		public function closeHandler(e:Event):void
+		public function handleClose(e:Event):void
 		{
 			Logger.info("onClose", e.toString());
 		}
 		
-		public function connectHandler(e:Event):void
+		public function handleConnect(e:Event):void
 		{
 			Logger.info("onConnect", e.toString());
-			var bytes:ByteArray = (new SnappyTest()).resultBytes;
-			Logger.info("sendData", bytes);
-			Logger.info("sendData", Bytes.toArrayString(bytes));
-			writeBytes(bytes);
+			writeBytes(processWritable());
 			flush();
 		}
 		
-		public function ioErrorHandler(e:Event):void
+		public function handleIOError(e:Event):void
 		{
 			Logger.info("onIoError", e.toString());
 		}
 		
-		public function securityErrorHandler(e:Event):void
+		public function handleSecurityError(e:Event):void
 		{
 			Logger.info("onSecurityError", e.toString());
 		}
 		
-		public function socketDataHandler(e:Event):void
+		public function handleSocketData(e:Event):void
 		{
 			Logger.info("onData", e.toString());
+			processReadable(readReponse());
+		}
+		
+		private function readReponse():ByteArray
+		{			
+			var bytes:ByteArray = new ByteArray();
+			readBytes(bytes);
+			return bytes;
+		}
+		
+		protected function processReadable(readable:ByteArray):void
+		{
+			Logger.info('data', readable);
+			Logger.info('data', ByteArrayUtil.toArrayString(readable));
+		}
+		
+		protected function processWritable():ByteArray
+		{
+			return null;
 		}
 		
 	}

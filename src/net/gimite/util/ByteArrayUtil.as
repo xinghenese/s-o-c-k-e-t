@@ -187,7 +187,7 @@ package net.gimite.util
 			return toArrayString(bytes);
 		}
 		
-		public static function toArrayString(bytes:ByteArray, fromStart:Boolean = true, radius:int = 10):String
+		public static function toArrayString(bytes:ByteArray, entire:Boolean = true, radius:int = 10):String
 		{
 			var result:String = "[", pos:int = bytes.position;
 			if(bytes == null){
@@ -196,13 +196,22 @@ package net.gimite.util
 			if(bytes.length == 0){
 				return "[]";
 			}
-			if(fromStart){
+			if(entire){
 				bytes.position = 0;
-			}			
-			while(bytes.bytesAvailable)
-			{
-				result = result + bytes.readUnsignedByte().toString(radius) + ", ";
 			}
+//			if(bytes.endian == Endian.BIG_ENDIAN){
+				while(bytes.bytesAvailable)
+				{
+					result = result + bytes.readUnsignedByte().toString(radius) + ", ";
+				}
+//			}
+//			else{
+//				while(bytes.bytesAvailable)
+//				{
+//					result = result + bytes.readUnsignedByte().toString(radius) + ", ";
+//				}
+//			}
+			
 			bytes.position = pos;
 			return result.replace(/,\s$/, "]");
 		}
