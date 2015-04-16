@@ -12,6 +12,8 @@
 package com.hurlant.math
 {
 
+	import net.gimite.util.ByteArrayUtil;
+	import net.gimite.logger.Logger;
 	import com.hurlant.crypto.prng.Random;
 	import com.hurlant.util.Hex;
 	import com.hurlant.util.Memory;

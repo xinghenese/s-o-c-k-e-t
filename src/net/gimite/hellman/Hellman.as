@@ -10,8 +10,9 @@ package net.gimite.hellman
 		private var p:BigInteger; // public key
     	private var g:BigInteger; // public base
 
-	    private static const PRIME:String = "171718397966129586011229151993178480901904202533705695869569760169920539808075437788747086722975900425740754301098468647941395164593810074170462799608062493021989285837416815548721035874378548121236050948528229416139585571568998066586304075565145536350296006867635076744949977849997684222020336013226588207303";
-	    private static const BASE:String = "2";
+//	    private static const PRIME:String = "171718397966129586011229151993178480901904202533705695869569760169920539808075437788747086722975900425740754301098468647941395164593810074170462799608062493021989285837416815548721035874378548121236050948528229416139585571568998066586304075565145536350296006867635076744949977849997684222020336013226588207303";
+	    private static const PRIME:String = "f488fd584e49dbcd20b49de49107366b336c380d451d0f7c88b31c7c5b2d8ef6f3c923c043f0a55b188d8ebb558cb85d38d334fd7c175743a31d186cde33212cb52aff3ce1b1294018118d7c84a70a72d686c40319c807297aca950cd9969fabd00a509b0246d3083d66a45d419f9c7cbd894b221926baaba25ec355e92f78c7";
+		private static const BASE:String = "2";
 	    private var privateKey:String = "";
 	
 	    private var priv:BigInteger;
@@ -24,16 +25,16 @@ package net.gimite.hellman
 	     */
 	    public function Hellman()
 	    {
-	        this.p = new BigInteger(PRIME);
-	        this.g = new BigInteger(BASE);
+	        this.p = new BigInteger(PRIME, 16, true);
+	        this.g = new BigInteger(BASE, 16, true);
 	        for (var i:int = 0; i < 12; i++)
 	        {
 				//randomVal:long
 	            var randomVal:int = (int) (Math.random() * 1000000000);
 				//problem
-//	            this.privateKey += String.valueOf(randomVal);
+	            this.privateKey += randomVal.toString(16);
 	        }
-	        this.priv = new BigInteger(privateKey);
+	        this.priv = new BigInteger(privateKey, 16, true);
 	    }
 	
 	    /**
@@ -69,20 +70,20 @@ package net.gimite.hellman
 	
 	    public function  getRCKey(publicKey:ByteArray):String
 	    {
-	        try
-	        {
-				//problem
+//	        try
+//	        {
+//				problem
 //	            var bigIntegerWrap:BigInteger = new BigInteger(1, publicKey);
 //	            var bitIntSecretKey:BigInteger = getShared(bigIntegerWrap);
 //	            var result:ByteArray = Base64Util.base64Encrypt(bitIntSecretKey.toByteArray());
 //	            var secret: String = new String(result);
 //	            return MD5Util.md5Encrypt(secret);
-	        }
+//	        }
 //	        catch (e:Exception)
-	        {
-	            //Logger.logThrowable(e);
-	        }
-	
+//	        {
+//	            Logger.logThrowable(e);
+//	        }
+//	
 	        return null;
 	    }
 	}
