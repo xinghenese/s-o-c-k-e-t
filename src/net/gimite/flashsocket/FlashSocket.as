@@ -14,16 +14,19 @@ package net.gimite.flashsocket
 	/**
 	 * @author Administrator
 	 */
-	public class FlashSocket extends Socket implements SocketListener
-	{		
+	public class FlashSocket extends Socket// implements SocketListener
+	{
+		private const parser:ProtocolParser = ProtocolParser.instance;
+		
 		public function FlashSocket(host:String, port:uint):void
 		{
 			super();
-			configureListeners();
 			if(host){
+				configureListeners();
 				loadPolicyFile(host);
 				super.connect(host, port);
 				Logger.log("connecting to " + host + ":" + port);
+//				return;
 			}
 		}
 		
@@ -42,34 +45,32 @@ package net.gimite.flashsocket
 			var policyUrl:String = "xmlsocket://" + host + ":" + port.toString();
 			Logger.info("policy file", policyUrl);
 			Security.loadPolicyFile(policyUrl);
-		}		
+		}
 		
-		public function handleClose(e:Event):void
+		protected function handleConnect(e:Event):void
+		{
+			Logger.info("onConnect", e.toString());
+		}
+		
+		protected function handleClose(e:Event):void
 		{
 			Logger.info("onClose", e.toString());
 		}
 		
-		public function handleConnect(e:Event):void
-		{
-			Logger.info("onConnect", e.toString());
-			writeBytes(processWritable());
-			flush();
-		}
-		
-		public function handleIOError(e:Event):void
+		protected function handleIOError(e:Event):void
 		{
 			Logger.info("onIoError", e.toString());
 		}
 		
-		public function handleSecurityError(e:Event):void
+		protected function handleSecurityError(e:Event):void
 		{
 			Logger.info("onSecurityError", e.toString());
 		}
 		
-		public function handleSocketData(e:Event):void
+		private function handleSocketData(e:Event):void
 		{
 			Logger.info("onData", e.toString());
-			processReadable(readReponse());
+			parser.parse(processReadable(readReponse()));
 		}
 		
 		private function readReponse():ByteArray
@@ -79,15 +80,20 @@ package net.gimite.flashsocket
 			return bytes;
 		}
 		
-		protected function processReadable(readable:ByteArray):void
+		protected function processReadable(readable:ByteArray):ByteArray
 		{
-			Logger.info('data', readable);
-			Logger.info('data', ByteArrayUtil.toArrayString(readable));
+			return readable;
 		}
 		
-		protected function processWritable():ByteArray
+		public final function write(writable:ByteArray):void
+		{			
+			writeBytes(processWritable(writable));
+			flush();
+		}
+		
+		protected function processWritable(writable:ByteArray):ByteArray
 		{
-			return null;
+			return writable;
 		}
 		
 	}

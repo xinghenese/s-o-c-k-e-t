@@ -1,5 +1,6 @@
 package net.gimite.snappy
 {
+	import net.gimite.flashsocket.ServerInfo;
 	import net.gimite.logger.Logger;
 	import net.gimite.flashsocket.SnappyFlashSocket;
 	import flash.display.Sprite;
@@ -7,7 +8,7 @@ package net.gimite.snappy
 	/**
 	 * @author Administrator
 	 */
-	public class FlashSocketTest extends Sprite
+	public class FlashSocketTest extends Sprite// implements SocketListener
 	{
 		private var host:Array = ["192.168.0.110", "192.168.1.66", "192.168.1.67", "192.168.1.68", "192.168.0.66", "192.168.0.67", "192.168.0.68"];
 		private var ordinal:int = 4;
@@ -22,16 +23,16 @@ package net.gimite.snappy
 		{
 			var _host:String = host[ordinal++];
 			if(_host){
-//				socket = new SnappyFlashSocket(_host);
-				var xmlString:String = "<HSK pbk=\"Re0M65x0B6lteiG/3Wm5LiT/7EvKxl39WZE8C7g40vTEN49+bjq84/lITSmsaJG1G3qk112vLIihMgNEpOCDbFtQODTMFg0QDxTKgAQ8zuK1Bgd+/bw/xYCik4lEC66pNryT4OO+LiIa19LuAJREIPN7C3pxHfnO1Jv7l2HhoH8=\"></HSK>";
-//				var xmlString:String = "<a prop=\"1\"><b></b></a>";
-				try{
-					Logger.info('xml', xmlString);
-					Logger.info('xml', JSON.stringify(parseSimpleXMLString(xmlString)));
-				}
-				catch(e:Error){
-					Logger.error(e);
-				}
+				socket = new SnappyFlashSocket(_host);
+//				var xmlString:String = "<HSK pbk=\"Re0M65x0B6lteiG/3Wm5LiT/7EvKxl39WZE8C7g40vTEN49+bjq84/lITSmsaJG1G3qk112vLIihMgNEpOCDbFtQODTMFg0QDxTKgAQ8zuK1Bgd+/bw/xYCik4lEC66pNryT4OO+LiIa19LuAJREIPN7C3pxHfnO1Jv7l2HhoH8=\"></HSK>";
+////				var xmlString:String = "<a prop=\"1\"><b></b></a>";
+//				try{
+//					Logger.info('xml', xmlString);
+//					Logger.info('xml', JSON.stringify(parseSimpleXMLString(xmlString)));
+//				}
+//				catch(e:Error){
+//					Logger.error(e);
+//				}
 			}
 		}
 		
