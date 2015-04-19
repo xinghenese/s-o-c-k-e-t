@@ -1,8 +1,8 @@
 package net.gimite.hellman
 {
+	import net.gimite.util.RC4Entity;
 	import net.gimite.logger.Logger;
 	import net.gimite.util.ByteArrayUtil;
-	import com.hurlant.crypto.prng.ARC4;
 	import flash.utils.ByteArray;
 	/**
 	 * @author Reco
@@ -15,15 +15,13 @@ package net.gimite.hellman
 		
 		public static const KEY_LENGTH:uint = 32;
 		
-		private var _rc4:ARC4 = null;
+		private var _rc4:RC4Entity = null;
 		private var _hellman:Hellman = null;
 		private var _key:ByteArray = null;
 		
 		public function RC4Encrypt(enforcer:SingletonEnforcer)
 		{
-//			if(_hellman == null){
-//				_hellman = new Hellman();
-//			}
+			
 		}
 		
 		public static function get instance():RC4Encrypt
@@ -49,16 +47,16 @@ package net.gimite.hellman
 			_enable = enable;
 		}
 		
-		public function generateKeyPair():Hellman
-		{
-			return new Hellman();
-		}
+//		public function generateKeyPair():Hellman
+//		{
+//			return new Hellman();
+//		}
 		
 		public function set encryptkey(key:String):void
 		{
 			Logger.info('key', key);
 			_key = ByteArrayUtil.createByteArray(true, key);
-			_rc4 = new ARC4(_key);
+			_rc4 = new RC4Entity(_key);
 			_ready = true;
 		}
 		

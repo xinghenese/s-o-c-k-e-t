@@ -1,8 +1,8 @@
 package net.gimite.flashsocket
 {
+	import net.gimite.connection.Connection;
 	import flash.utils.ByteArray;
 	import net.gimite.logger.Logger;
-	import net.gimite.packet.ProtocolPacket;
 	/**
 	 * @author Administrator
 	 */
@@ -25,9 +25,9 @@ package net.gimite.flashsocket
 		
 		public function parse(data:ByteArray):void
 		{
-			Logger.info('data', data);
+			Logger.info('ProtocolParser.parse', data);
 			var raw:String = data.toString();
-			var parsed:Object = null;	
+			var parsed:Object = null;
 			try{
 				parsed = parseXML(raw);
 			}
@@ -36,9 +36,7 @@ package net.gimite.flashsocket
 			}
 			finally{
 				if(parsed != null){
-					var packet:ProtocolPacket = ProtocolPacket.createPacket(parsed.name);
-					packet.fillData(parsed.data);
-					fireDataParsed(packet);
+					Connection.instance.response(parsed);
 				}
 			}
 		}
@@ -66,10 +64,10 @@ package net.gimite.flashsocket
 			}
 		}
 		
-		private function fireDataParsed(packet:ProtocolPacket):void
-		{
-			packet.process();
-		}
+//		private function fireDataParsed(packet:ProtocolPacket):void
+//		{
+//			packet.process();
+//		}
 	}
 }
 

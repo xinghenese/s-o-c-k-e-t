@@ -1,5 +1,6 @@
 package net.gimite.packet
 {
+	import com.hurlant.util.der.Set;
 	import flash.utils.getDefinitionByName;
 	import flash.utils.getQualifiedClassName;
 	import net.gimite.logger.Logger;
@@ -8,26 +9,52 @@ package net.gimite.packet
 	 */
 	public class ProtocolPacket
 	{
+		private static var _packets:Vector.<ProtocolPacket> = new Vector.<ProtocolPacket>();
+		
 		protected var _name:String = "UNTITLED";
 		protected var _data:Object = {};
-		protected var _keyvalue:String;
+		protected var _keyname:String = '';
+		
 		
 		public function ProtocolPacket(data:* = null)
 		{
-			_name = SocketProtocolName.getName(getQualifiedClassName(this)) || _name;
+			var clzName:String = getQualifiedClassName(this);
+			_name = SocketProtocolInfo.getName(clzName) || _name;
+			_keyname = SocketProtocolInfo.getKey(clzName) || _keyname;
 			if(data != null){
-				if(data is String && _keyvalue){
-					fillData(_keyvalue, data);
+				if(data is String && _keyname){
+					fillData(_keyname, data);
 				}
 				else if(data is Object){
 					fillData(data);
-				}				
+				}
 			}
+			_packets.push(this);
 		}
 		
-		public static function createPacket(name:String):ProtocolPacket
+		public static function refretchPacket(name:String):ProtocolPacket
 		{
-			var clzName:String = SocketProtocolName.getClassName(name);
+			if(_packets.length == 0){
+				return null;
+			}
+			var clzName:String = SocketProtocolInfo.getClassNameByTagName(name);
+			if(clzName == null){
+				return null;
+			}
+			var clazz:Class = getDefinitionByName(clzName) as Class;
+			for(var i:uint = 0, length:uint = _packets.length; i < length; i ++){
+				if(_packets[i] is clazz){
+					Logger.log('fetched');
+					return _packets[i].reset();
+				}
+			}
+			return null;
+//			return new clazz();
+		}
+		
+		public static function createPacket2(name:String):ProtocolPacket
+		{
+			var clzName:String = SocketProtocolInfo.getClassNameByTagName(name);
 			if(clzName == null){
 				return new ProtocolPacket();
 			}
@@ -35,7 +62,7 @@ package net.gimite.packet
 			return new clazz();
 		}
 		
-		public final function get name():String
+		public final function get tagname():String
 		{
 			return _name;
 		}
@@ -72,9 +99,17 @@ package net.gimite.packet
 			
 		}
 		
+		protected final function reset():ProtocolPacket
+		{
+			_data = {};
+			return this;
+		}
+		
 		public final function toJSONString():String
 		{
-			return JSON.stringify(this);
+			var result:Object = {};
+			result[_name] = _data;
+			return JSON.stringify(result);
 		}
 		
 		public final function toXMLString():String

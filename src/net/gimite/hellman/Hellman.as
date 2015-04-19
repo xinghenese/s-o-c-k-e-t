@@ -32,14 +32,19 @@ package net.gimite.hellman
 	    {
 	        this.p = new BigInteger(PRIME, 16, true);
 	        this.g = new BigInteger(BASE, 16, true);
-	        for (var i:int = 0; i < 12; i++)
-	        {
-				//randomVal:long
-	            var randomVal:int = (int) (Math.random() * 1000000000);
-				//problem
-	            this.privateKey += randomVal.toString(16);
-	        }
+//	        for (var i:int = 0; i < 12; i++)
+//	        {
+//				//randomVal:long
+//	            var randomVal:int = (int) (Math.random() * 1000000000);
+//				//problem
+//	            this.privateKey += randomVal.toString(16);
+//	        }
+			privateKey = '1aad644d251a39f022152430a132660125874e52e2eb04410545d80190fb92b2366e4c72af96934321a8ef12604d4e0';
 	        this.priv = new BigInteger(privateKey, 16, true);
+			Logger.info('PRIME', this.p.toString(10));
+			Logger.info('PRIME', this.p.toString(16));
+			Logger.info('priv', this.priv.toString(10));
+			Logger.info('priv', this.priv.toString(16));
 	    }
 	
 	    /**

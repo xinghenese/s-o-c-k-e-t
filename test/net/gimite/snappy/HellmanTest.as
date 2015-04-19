@@ -2,12 +2,11 @@ package net.gimite.snappy {
 	import com.hurlant.math.BigInteger;
 	import flash.display.Sprite;
 	import net.gimite.flashsocket.ProtocolParser;
-	import net.gimite.flashsocket.StaticClass;
 	import net.gimite.hellman.Hellman;
 	import net.gimite.logger.Logger;
 	import net.gimite.packet.HandShakeProtocolPacket;
 	import net.gimite.packet.ProtocolPacket;
-	import net.gimite.packet.SocketProtocolName;
+	import net.gimite.packet.SocketProtocolInfo;
 	import net.gimite.util.ByteArrayUtil;
 	/**
 	 * @author Reco

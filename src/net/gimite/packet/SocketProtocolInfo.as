@@ -4,21 +4,31 @@ package net.gimite.packet
 	/**
 	 * @author Reco
 	 */
-	public final class SocketProtocolName
+	public final class SocketProtocolInfo
 	{
 		private static const prefix:String = 'net.gimite.packet::';
 		
 		private static const names:Object = {
 			HandShakeProtocolPacket: 'HSK',
-			AuthenticateProtocolPacket: "Auth"
-		}
+			AuthenticateProtocolPacket: 'Auth'
+		};
+		
+		private static const keys:Object = {
+			HandShakeProtocolPacket: 'pbk'
+		};
 		
 		public static function getName(clazz:String):String
 		{
 			return names[clazz.replace(prefix, '')];
 		}
 		
-		public static function getClassName(name:String):String
+		public static function getKey(clazz:String):String
+		{
+			Logger.info('clazz', clazz);
+			return keys[clazz.replace(prefix, '')];
+		}
+		
+		public static function getClassNameByTagName(name:String):String
 		{
 			if(name in names){
 				return name;

@@ -5,5 +5,9 @@ package net.gimite.packet
 	 */
 	public class AuthenticateProtocolPacket extends ProtocolPacket
 	{
+		public function AuthenticateProtocolPacket(data:*)
+		{
+			super(data);
+		}
 	}
 }

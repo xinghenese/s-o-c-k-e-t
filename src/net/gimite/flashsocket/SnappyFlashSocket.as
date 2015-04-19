@@ -1,5 +1,7 @@
 package net.gimite.flashsocket
 {
+	import net.gimite.connection.Connection;
+	import net.gimite.hellman.RC4Encrypt;
 	import net.gimite.packet.HandShakeProtocolPacket;
 	import flash.events.Event;
 	import flash.utils.ByteArray;
@@ -12,7 +14,7 @@ package net.gimite.flashsocket
 	/**
 	 * @author Administrator
 	 */
-	public class SnappyFlashSocket extends FlashSocket
+	public class SnappyFlashSocket extends EncryptedFlashSocket
 	{
 		private var encoder:SnappyFrameEncoder;
 		private var decoder:SnappyFrameDecoder;
@@ -26,16 +28,16 @@ package net.gimite.flashsocket
 		}
 		
 		override protected function handleConnect(e:Event):void
-		{			
-			super.handleConnect(e);
+		{
 //			var data:String = '<HSK pbk="XHBxevmo8lAe34xM87jE+3dYxfEOhnjqt/Ca2I4PZk9SorG5v+ns4dbEn2vOoUlfScFBIAht0bylxiiBq27y3Ia08aDEYqe6b/x8uuBGfRmuAc9OT4eLFeJsrmmzDzDtTIoWHPnRv9V045oIKVnRN5girx9muphhL/AVSPQ3lGA="></HSK>';
-			var pbk:String = (new Hellman()).getPublicKey();
-			var packet:ProtocolPacket = new HandShakeProtocolPacket(pbk);
-//			packet.fillData('pbk', pbk);
-			var data:String = packet.toXMLString();
-			var bytes:ByteArray = new ByteArray();
-			bytes.writeUTFBytes(data);
-			write(bytes);
+			if(!RC4Encrypt.ready){
+//				var pbk:String = (new Hellman()).getPublicKey();
+//				Logger.info('pbk', pbk);
+				var packet:ProtocolPacket = new HandShakeProtocolPacket();
+				Connection.instance.request(packet);
+			}
+						
+			super.handleConnect(e);		
 		}
 		
 		override protected function handleClose(e:Event):void
@@ -55,10 +57,10 @@ package net.gimite.flashsocket
 		
 		override protected function processReadable(readable:ByteArray):ByteArray
 		{
-			var length:int = readable.readUnsignedInt();
-			var tmp:ByteArray = new ByteArray();
-			readable.readBytes(tmp);
-			var result:ByteArray = decoder.decode(tmp);
+			Logger.log('SnappySocket.processReadable');
+			readable = super.processReadable(readable);
+			
+			var result:ByteArray = decoder.decode(readable);
 			
 			Logger.info('data', readable);
 			Logger.info('data', ByteArrayUtil.toArrayString(readable));
@@ -75,15 +77,12 @@ package net.gimite.flashsocket
 			Logger.info('writable', writable);
 			Logger.info('writable', ByteArrayUtil.toArrayString(writable));
 			
-			writable =  encoder.encode(writable);
+			var result:ByteArray =  encoder.encode(writable);
 			
-			var result:ByteArray = new ByteArray();
-			result.writeInt(writable.length);
-			result.writeBytes(writable);
+			Logger.info('snappy-encoded', result);
+			Logger.info('snappy-encoded', ByteArrayUtil.toArrayString(result));
 			
-			Logger.info("sendData", result);
-			Logger.info("sendData", ByteArrayUtil.toArrayString(result));
-			return result;
+			return super.processWritable(result);
 			//super.processWritable();
 		}
 		
