@@ -1,12 +1,14 @@
 package net.gimite.flashsocket
 {
+	import net.gimite.packet.HandShakeProtocolPacket;
+	import flash.events.Event;
+	import flash.utils.ByteArray;
 	import net.gimite.hellman.Hellman;
+	import net.gimite.logger.Logger;
+	import net.gimite.packet.ProtocolPacket;
 	import net.gimite.snappy.SnappyFrameDecoder;
 	import net.gimite.snappy.SnappyFrameEncoder;
 	import net.gimite.util.ByteArrayUtil;
-	import net.gimite.logger.Logger;
-	import flash.utils.ByteArray;
-	import flash.events.Event;
 	/**
 	 * @author Administrator
 	 */
@@ -28,8 +30,8 @@ package net.gimite.flashsocket
 			super.handleConnect(e);
 //			var data:String = '<HSK pbk="XHBxevmo8lAe34xM87jE+3dYxfEOhnjqt/Ca2I4PZk9SorG5v+ns4dbEn2vOoUlfScFBIAht0bylxiiBq27y3Ia08aDEYqe6b/x8uuBGfRmuAc9OT4eLFeJsrmmzDzDtTIoWHPnRv9V045oIKVnRN5girx9muphhL/AVSPQ3lGA="></HSK>';
 			var pbk:String = (new Hellman()).getPublicKey();
-			var packet:ProtocolPacket = new ProtocolPacket('HSK');
-			packet.fillData('pbk', pbk);
+			var packet:ProtocolPacket = new HandShakeProtocolPacket(pbk);
+//			packet.fillData('pbk', pbk);
 			var data:String = packet.toXMLString();
 			var bytes:ByteArray = new ByteArray();
 			bytes.writeUTFBytes(data);

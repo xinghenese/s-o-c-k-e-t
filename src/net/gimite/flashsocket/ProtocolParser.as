@@ -1,7 +1,8 @@
 package net.gimite.flashsocket
 {
-	import net.gimite.logger.Logger;
 	import flash.utils.ByteArray;
+	import net.gimite.logger.Logger;
+	import net.gimite.packet.ProtocolPacket;
 	/**
 	 * @author Administrator
 	 */
@@ -9,19 +10,15 @@ package net.gimite.flashsocket
 	{
 		private static var INSTANCE:ProtocolParser = null;
 		
-		private static const secret:Number = Math.random();
-		
-		public function ProtocolParser(enforcer:Number)
+		public function ProtocolParser(enforcer:SingletonEnforcer)
 		{
-			if(enforcer != secret){
-				throw new Error("Error: use Singleton instance instead.");
-			}
+			
 		}
 		
 		public static function get instance():ProtocolParser
 		{
 			if(INSTANCE == null){
-				INSTANCE = new ProtocolParser(secret);
+				INSTANCE = new ProtocolParser(new SingletonEnforcer());
 			}
 			return INSTANCE;
 		}
@@ -29,23 +26,54 @@ package net.gimite.flashsocket
 		public function parse(data:ByteArray):void
 		{
 			Logger.info('data', data);
-			var result:ProtocolPacket = parseSimpleXML(new XML(data.toString()));
-			fireDataParsed(result);
-		}
-		
-		private function parseSimpleXML(xml:XML):ProtocolPacket
-		{
-			var result:ProtocolPacket = new ProtocolPacket(xml.name().toString());
-			var attrs:XMLList = xml.attributes();
-			for each(var attr:XML in attrs){
-				result.fillData(attr.name().toString(), attr.toString());
+			var raw:String = data.toString();
+			var parsed:Object = null;	
+			try{
+				parsed = parseXML(raw);
 			}
-			return result;
+			catch(e:Error){
+				parsed = parseJSON(raw);
+			}
+			finally{
+				if(parsed != null){
+					var packet:ProtocolPacket = ProtocolPacket.createPacket(parsed.name);
+					packet.fillData(parsed.data);
+					fireDataParsed(packet);
+				}
+			}
 		}
 		
-		private function fireDataParsed(data:ProtocolPacket):void
+		private function parseJSON(data:String):Object
 		{
-			Logger.info('parsed', JSON.stringify(data));
+			return JSON.parse(data);
+		}
+		
+		private function parseXML(data:String):Object
+		{
+			return parseSimpleXML(new XML(data));
+		}
+		
+		private function parseSimpleXML(xml:XML):Object
+		{
+			var attrs:XMLList = xml.attributes();
+			var data:Object = {};
+			for each(var attr:XML in attrs){
+				data[attr.name().toString()] = attr.toString();
+			}
+			return {
+				name: xml.name().toString(),
+				data: data
+			}
+		}
+		
+		private function fireDataParsed(packet:ProtocolPacket):void
+		{
+			packet.process();
 		}
 	}
+}
+
+class SingletonEnforcer
+{
+	
 }

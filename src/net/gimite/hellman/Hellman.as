@@ -72,19 +72,23 @@ package net.gimite.hellman
 	        return pub.modPow(priv, this.p);
 	    }
 	
-	    public function  getRCKey(publicKey:ByteArray):String
+	    public function  getRCKey(publicKey:*):String
 	    {
-	        try
-	        {
-	            var bigIntegerWrap:BigInteger = new BigInteger(publicKey, 16, true);
-	            var bitIntSecretKey:BigInteger = getShared(bigIntegerWrap);
-	            return MD5.hash(Base64.encodeByteArray(bitIntSecretKey.toByteArray()));
-	        }
-	        catch (e:Error)
-	        {
-	            Logger.error(e);
-	        }
-	
+			if(publicKey is String){
+				publicKey = Base64.decodeToByteArray(publicKey);
+			}
+			if(publicKey is ByteArray){
+				try
+		        {
+		            var bigIntegerWrap:BigInteger = new BigInteger(publicKey, 16, true);
+		            var bitIntSecretKey:BigInteger = getShared(bigIntegerWrap);
+		            return MD5.hash(Base64.encodeByteArray(bitIntSecretKey.toByteArray()));
+		        }
+		        catch (e:Error)
+		        {
+		            Logger.error(e);
+		        }
+			}
 	        return null;
 	    }
 	}

@@ -1,10 +1,14 @@
 package net.gimite.snappy {
-	import net.gimite.flashsocket.ProtocolPacket;
-	import net.gimite.util.ByteArrayUtil;
-	import net.gimite.hellman.Hellman;
 	import com.hurlant.math.BigInteger;
-	import net.gimite.logger.Logger;
 	import flash.display.Sprite;
+	import net.gimite.flashsocket.ProtocolParser;
+	import net.gimite.flashsocket.StaticClass;
+	import net.gimite.hellman.Hellman;
+	import net.gimite.logger.Logger;
+	import net.gimite.packet.HandShakeProtocolPacket;
+	import net.gimite.packet.ProtocolPacket;
+	import net.gimite.packet.SocketProtocolName;
+	import net.gimite.util.ByteArrayUtil;
 	/**
 	 * @author Reco
 	 */
@@ -31,31 +35,74 @@ package net.gimite.snappy {
 			Logger.info('base64-encoded-public-key', pbk);
 			
 			try{
-				Logger.info('xml', sendInitPacket());
-				Logger.log('xml');
+//				var packet:ProtocolPacket = sendInitPacket();
+//				var xml:String = packet.toXMLString();
+//				var json:String = packet.toJSONString()
+//				Logger.info('xml', xml);
+//				Logger.info('json', json);
+
+var xml:String = (<HSK pbk={pbk}></HSK>).toXMLString();
+				
+				ProtocolParser.instance.parse(ByteArrayUtil.createByteArray(true, xml));
+				
 			}
 			catch(e:Error){
+				Logger.log('error in create packet');
 				Logger.error(e);
 			}
+			
+//			try{
+//				var pt:StaticClass = new ProtocolPacketName();
+//			}
+//			catch(e:Error){
+//				Logger.log('StaticClass');
+//			}
 //			Logger.info('')
 			
 		}
 		
-		private static function sendInitPacket():String{
-//			var packet:ProtocolPacket = new ProtocolPacket('HSK');
-//			packet.fillData('pbk', pbk);
-			var o:Object = {'pbk':pbk};
-			var a = o.a;
-			var b = o.b;
+		
+		
+		private static function sendInitPacket():ProtocolPacket{
+			var packet:ProtocolPacket = new HandShakeProtocolPacket();
+			packet.fillData('pbk', pbk);
 			
-			var xml = <HSK></HSK>;
-			
-			for(var key in o){
-				xml.@[key] = o[key];
+
+//			var o:Object = {'pbk':pbk};
+//			var a = o.a;
+//			var b = o.b;
+//			
+//			var xml = <HSK></HSK>;
+//			
+//			for(var key in o){
+//				xml.@[key] = o[key];
+//			}
+			return packet;
+		}
+		
+		private function parseJSON():void
+		{
+			try{
+				var json:Object = JSON.parse('<a p="d"></a>');
+				Logger.info('json', json);
 			}
-			
-//			var xml:XML = <xml a={o.c}  b = {o.d}></xml>;
-			return xml.toXMLString().replace(/\/>$/, '></' + 'HSK' + '>');
+			catch(e:Error){
+				Logger.log('error in parsing json');
+				Logger.error(e);
+			}
+		}
+		
+		private function parseXML():void
+		{
+			try{
+				var xml:XML = new XML('{a:1, b:2}');
+				Logger.info('new xml string', xml.toXMLString());
+				Logger.info('new xml', xml.name().toString());
+			}
+			catch(e:Error){
+				Logger.log('error in parsing xml');
+				Logger.error(e);
+			}
 		}
 		
 		private static function toArrayString(hex:String):String{

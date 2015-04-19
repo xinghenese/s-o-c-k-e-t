@@ -86,9 +86,11 @@ package net.gimite.flashsocket
 		}
 		
 		public final function write(writable:ByteArray):void
-		{			
-			writeBytes(processWritable(writable));
-			flush();
+		{
+			if(connected){
+				writeBytes(processWritable(writable));
+				flush();
+			}			
 		}
 		
 		protected function processWritable(writable:ByteArray):ByteArray
