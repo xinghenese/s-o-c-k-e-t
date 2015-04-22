@@ -1,5 +1,7 @@
 package net.gimite.logger
 {
+	import net.gimite.util.ByteArrayUtil;
+	import flash.utils.ByteArray;
 	import flash.external.ExternalInterface;
 	/**
 	 * @author Reco
@@ -13,19 +15,19 @@ package net.gimite.logger
 			{
 				fn = function(task:String):Function
 				{
-					if(task == "log")
+					if(task == 'log')
 					{
-						return function(msg:String = ""):void
+						return function(msg:String = ''):void
 						{
-							ExternalInterface.call("console.log", "%cINFO: ", "color:green; font-weight:bold;", msg);
+							ExternalInterface.call('console.log', '%cINFO: ', 'color:green; font-weight:bold;', msg);
 						}
 					}
 					else
 					{
-						return function(tag:String = "", msg:String = ""):void
+						return function(tag:String = '', msg:String = ''):void
 						{
-							ExternalInterface.call("console." + task, "%c[" + tag + "]: ", "font-weight:bold;", msg);
-						}	
+							ExternalInterface.call('console.' + task, '%c[' + tag + ']: ', 'font-weight:bold;', msg);
+						}
 					}									
 				};
 			}
@@ -33,18 +35,18 @@ package net.gimite.logger
 			{
 				fn = function(task:String):Function
 				{
-					if(task == "log")
+					if(task == 'log')
 					{
-						return function(msg:String = ""):void
+						return function(msg:String = ''):void
 						{
 							trace(msg);
 						}	
 					}
 					else
 					{
-						return function(tag:String = "", msg:String = ""):void
+						return function(tag:String = '', msg:String = ''):void
 						{
-							trace("[" + tag + "]: ", msg);
+							trace('[' + tag + ']: ', msg);
 						}	
 					}									
 				};
@@ -52,11 +54,23 @@ package net.gimite.logger
 			return fn;
 		})();
 		
-		public static var log : Function = callLog("log");
-		public static var info : Function = callLog("info");
-		public static var warn : Function = callLog("warn");
+		public static var log : Function = callLog('log');
+//		public static var info : Function = callLog('info');
+		public static var info : Function = (function():Function{
+			var _info:Function = callLog('info');
+			return function(tag:String = '', msg:* = null):void{
+				if(msg is ByteArray){
+					_info(tag, msg);
+					_info(tag, ByteArrayUtil.toArrayString(msg));
+				}
+				else{
+					_info(tag, msg);
+				}
+			}
+		})();
+		public static var warn : Function = callLog('warn');
 		public static var error: Function = (function():Function{
-			var _error:Function = callLog("error");
+			var _error:Function = callLog('error');
 			return function(err:*, msg:String = ''):void{
 				if(err is Error){
 					msg = err.message;
@@ -68,6 +82,20 @@ package net.gimite.logger
 				_error(err, msg);
 			};
 		})();
-
+		
+		public static function ln():void{
+			ExternalInterface.call('console.log', '');
+		};
+		private static function writeln(fn:Function):Function{
+			return function(tag:String = '', msg:* = null):void{
+				fn(tag, msg);
+				ln();
+			}
+		}
+		
+		public static var logln:Function = writeln(log); 
+		public static var infoln:Function = writeln(info);
+		public static var warnln:Function = writeln(warn);
+		public static var errorln:Function = writeln(error);
 	}
 }
