@@ -23,6 +23,7 @@ package net.gimite.util
 //			Logger.log('extra: ' + extra);
 			
 			var result:ByteArray = ByteArrayUtil.createByteArray(false);
+			var extra_bts:ByteArray = ByteArrayUtil.createByteArray(false, 1);
 			
 			var pos:int = dec.length;
 			var last_pos:int = pos;
@@ -37,8 +38,9 @@ package net.gimite.util
 //				Logger.info('_bytes', ByteArrayUtil.toArrayString(_bytes));				
 //				Logger.info('cal', fromArray(_bytes));
 				//
-				
-				var bytes:ByteArray = i > 0 ? ByteArrayUtil.mutiplyByteArrays(_bytes, extra_bytes) : _bytes;
+				var bytes:ByteArray = ByteArrayUtil.mutiplyByteArrays(_bytes, extra_bts);
+//				var bytes:ByteArray = i > 0 ? ByteArrayUtil.mutiplyByteArrays(_bytes, extra_bytes) : _bytes;
+				extra_bts = ByteArrayUtil.mutiplyByteArrays(extra_bts, extra_bytes);
 				
 //				if(i==1){
 					Logger.info('original' + i, ByteArrayUtil.toArrayString(_bytes, true, 16));
@@ -62,7 +64,7 @@ package net.gimite.util
 //			Logger.log('dec-array: ' + ByteArrayUtil.toArrayString(result));
 //			Logger.log('endian: ' + result.endian);
 			
-			return result;
+			return ByteArrayUtil.createByteArray(true, result);
 		}
 		
 		public static function fromArray(arr:*, little_endian:Boolean = true):int{

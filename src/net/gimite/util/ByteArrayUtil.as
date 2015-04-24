@@ -50,7 +50,8 @@ package net.gimite.util
 						bytes.writeUTFBytes(value);
 						break;
 					case (value is ByteArray):
-						bytes.writeBytes(value, 0, bit);
+//						bytes.writeBytes(value, 0, bit);
+						copy(value, bytes);
 						break;
 					case (value is Array):
 						switch (bit){								
@@ -89,6 +90,18 @@ package net.gimite.util
 				}
 			}
 			return true;
+		}
+		
+		public static function copy(from:ByteArray, to:ByteArray):void
+		{
+			if(from.endian == to.endian){
+				to.writeBytes(from);
+			}
+			else{
+				for(var len:int = from.length, i:int = len; i > 0; i --){
+					to[len - i] = from[i - 1];
+				}
+			}
 		}
 		
 		public static function addUpByteArrays(bytes1:ByteArray, bytes2:ByteArray):ByteArray
@@ -203,6 +216,7 @@ package net.gimite.util
 				while(bytes.bytesAvailable)
 				{
 					result = result + bytes.readUnsignedByte().toString(radius) + ", ";
+//					result = result + bytes.readByte().toString(radius) + ", ";
 				}
 //			}
 //			else{

@@ -1,5 +1,6 @@
 package net.gimite.hellman
 {
+	import net.gimite.util.Dec;
 	import com.hurlant.util.Base64;
 	import com.hurlant.crypto.prng.ARC4;
 	import net.gimite.logger.Logger;
@@ -80,7 +81,7 @@ package net.gimite.hellman
 	    public function  getRCKey(publicKey:*):String
 	    {
 			if(publicKey is String){
-				publicKey = Base64.decodeToByteArray(publicKey);
+				publicKey = Dec.toArray(Base64.decode(publicKey));
 			}
 			if(publicKey is ByteArray){
 				try

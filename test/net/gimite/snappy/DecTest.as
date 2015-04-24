@@ -16,10 +16,10 @@ package net.gimite.snappy
 					
 			var str:String = "171718397966129586011229151993178480901904202533705695869569760169920539808075437788747086722975900425740754301098468647941395164593810074170462799608062493021989285837416815548721035874378548121236050948528229416139585571568998066586304075565145536350296006867635076744949977849997684222020336013226588207303";
 			
-			Logger.log(str.length);
+//			Logger.log(str.length);
 			
 //			var str2:String = "1234567890123";
-			var str2:String = "1234567890";
+			var str2:String = "12345678901234567890";
 			
 //			Logger.info('str2', parseInt(str2));
 //			Logger.info('str2', ByteArrayUtil.toByteString(parseInt(str2)));
@@ -38,8 +38,11 @@ package net.gimite.snappy
 //			Logger.info('0x-times', times.toString(16));
 //			Logger.info('bts_times', ByteArrayUtil.toArrayString(bts_times, true, 16));
 			var result:ByteArray = Dec.toArray(str);
+//			var result2:ByteArray = ByteArrayUtil.createByteArray(true, result);
 			Logger.info('result', ByteArrayUtil.toArrayString(result, true, 16));
 			Logger.info('length', result.length);
+			
+//			Logger.info('result2', result2);
 //			
 //			Logger.log('cache?');
 

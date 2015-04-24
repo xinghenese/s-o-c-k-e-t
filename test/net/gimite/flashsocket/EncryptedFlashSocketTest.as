@@ -1,24 +1,16 @@
 package net.gimite.flashsocket
 {
-	import net.gimite.util.ByteArrayUtil;
-	import net.gimite.logger.Logger;
 	import net.gimite.hellman.RC4Encrypt;
+	import net.gimite.logger.Logger;
 	import flash.utils.ByteArray;
-	import flash.events.Event;
 	/**
 	 * @author Administrator
 	 */
-	public class EncryptedFlashSocket extends PayloadFlashSocket
+	public class EncryptedFlashSocketTest extends PayloadFlashSocketTest
 	{
-		public function EncryptedFlashSocket(host:String = null, port:uint = 80):void
+		public function EncryptedFlashSocketTest()
 		{
-			Logger.log('EncryptedFlashSocket');
-			super(host, port);
-		}
-		
-		override protected function handleConnect(e:Event):void
-		{
-			
+			super();
 		}
 		
 		override protected function processReadable(readable:ByteArray):ByteArray

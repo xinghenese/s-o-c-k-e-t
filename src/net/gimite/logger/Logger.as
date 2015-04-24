@@ -61,7 +61,7 @@ package net.gimite.logger
 			return function(tag:String = '', msg:* = null):void{
 				if(msg is ByteArray){
 					_info(tag, msg);
-					_info(tag, ByteArrayUtil.toArrayString(msg));
+					_info(tag, ByteArrayUtil.toArrayString(msg, true, 16));
 				}
 				else{
 					_info(tag, msg);
