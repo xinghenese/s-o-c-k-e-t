@@ -11,6 +11,7 @@ package net.gimite.logger
 		private static var callLog:Function = (function():Function
 		{
 			var fn:Function;
+			var length:int = 160;
 			if(ExternalInterface.available)
 			{
 				fn = function(task:String):Function
@@ -19,14 +20,16 @@ package net.gimite.logger
 					{
 						return function(msg:String = ''):void
 						{
-							ExternalInterface.call('console.log', '%cINFO: ', 'color:green; font-weight:bold;', msg);
+							ExternalInterface.call('console.log', '%cINFO: %c', 
+								'color:green; font-weight:bold;', 'word-break:break-all;', msg);
 						}
 					}
 					else
 					{
 						return function(tag:String = '', msg:String = ''):void
 						{
-							ExternalInterface.call('console.' + task, '%c[' + tag + ']: ', 'font-weight:bold;', msg);
+							ExternalInterface.call('console.' + task, '%c[' + tag + ']: %c', 
+								'font-weight:bold;', 'word-break:break-all;', msg);
 						}
 					}									
 				};
@@ -61,7 +64,7 @@ package net.gimite.logger
 			return function(tag:String = '', msg:* = null):void{
 				if(msg is ByteArray){
 					_info(tag, msg);
-					_info(tag, ByteArrayUtil.toArrayString(msg, true, 16));
+					_info(tag, ByteArrayUtil.toArrayString(msg, true, 10));
 				}
 				else{
 					_info(tag, msg);
@@ -97,5 +100,19 @@ package net.gimite.logger
 		public static var infoln:Function = writeln(info);
 		public static var warnln:Function = writeln(warn);
 		public static var errorln:Function = writeln(error);
+		
+		private static function splitBlocksWithFixedLength(str:String, length:int, separate:String, firstlength:int = 0):String
+		{
+			firstlength = firstlength || length;
+			var result:String = separate + str.substr(start, firstlength);
+			var len:int = str.length;
+			var start:int = firstlength;
+			while(start < len){
+				result += separate + str.substr(start, length);
+				start += length;
+			}
+//			return result.substr(1);
+			return result;
+		}
 	}
 }

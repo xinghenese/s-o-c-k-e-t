@@ -86,8 +86,11 @@ package net.gimite.hellman
 			if(publicKey is ByteArray){
 				try
 		        {
-		            var bigIntegerWrap:BigInteger = new BigInteger(publicKey, 16, true);
+		            var bigIntegerWrap:BigInteger = new BigInteger(publicKey, 0, true);
+					Logger.info('bigIntegerWrap', bigIntegerWrap.toString(16));
 		            var bitIntSecretKey:BigInteger = getShared(bigIntegerWrap);
+					Logger.info('bigIntSecretKey', bitIntSecretKey);
+					Logger.info('base64-encoded-privateKey', Base64.encodeByteArray(bitIntSecretKey.toByteArray()));
 		            return MD5.hash(Base64.encodeByteArray(bitIntSecretKey.toByteArray()));
 		        }
 		        catch (e:Error)
