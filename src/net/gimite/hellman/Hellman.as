@@ -40,8 +40,10 @@ package net.gimite.hellman
 //				//problem
 //	            this.privateKey += randomVal.toString(16);
 //	        }
-			privateKey = '1aad644d251a39f022152430a132660125874e52e2eb04410545d80190fb92b2366e4c72af96934321a8ef12604d4e0';
-	        this.priv = new BigInteger(privateKey, 16, true);
+//			privateKey = '1aad644d251a39f022152430a132660125874e52e2eb04410545d80190fb92b2366e4c72af96934321a8ef12604d4e0';
+	        privateKey = '6c8d06a30131282a50e67f0da618ee00c9da747b027ff6df53d906548cf8c79d3255c357d38a3efdca6ab6d750';
+			
+			this.priv = new BigInteger(privateKey, 16, true);
 			Logger.info('PRIME', this.p.toString(10));
 			Logger.info('PRIME', this.p.toString(16));
 			Logger.info('priv', this.priv.toString(10));
@@ -86,6 +88,8 @@ package net.gimite.hellman
 			if(publicKey is ByteArray){
 				try
 		        {
+					publicKey.position = 0;
+					Logger.info('publicKey', publicKey);
 		            var bigIntegerWrap:BigInteger = new BigInteger(publicKey, 0, true);
 					Logger.info('bigIntegerWrap', bigIntegerWrap.toString(16));
 		            var bitIntSecretKey:BigInteger = getShared(bigIntegerWrap);

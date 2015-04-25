@@ -15,6 +15,7 @@ package net.gimite.snappy
 		public function DecTest(){
 					
 			var str:String = "171718397966129586011229151993178480901904202533705695869569760169920539808075437788747086722975900425740754301098468647941395164593810074170462799608062493021989285837416815548721035874378548121236050948528229416139585571568998066586304075565145536350296006867635076744949977849997684222020336013226588207303";
+			var str3:String = "995845195283355508294200169411239006499875513624704805548067460707083673456897512767565719992396738234603344";
 			
 //			Logger.log(str.length);
 			
@@ -37,10 +38,12 @@ package net.gimite.snappy
 //			Logger.info('times', times.toString());
 //			Logger.info('0x-times', times.toString(16));
 //			Logger.info('bts_times', ByteArrayUtil.toArrayString(bts_times, true, 16));
-			var result:ByteArray = Dec.toArray(str);
+			var result:ByteArray = Dec.toArray(str3);
 //			var result2:ByteArray = ByteArrayUtil.createByteArray(true, result);
 			Logger.info('result', ByteArrayUtil.toArrayString(result, true, 16));
 			Logger.info('length', result.length);
+			
+			Logger.info('result', (new BigInteger(result, 0 , true).toString(16)));
 			
 //			Logger.info('result2', result2);
 //			

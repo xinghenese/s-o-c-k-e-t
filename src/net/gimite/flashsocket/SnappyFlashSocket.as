@@ -37,7 +37,7 @@ package net.gimite.flashsocket
 				Connection.instance.request(packet);
 			}
 						
-			super.handleConnect(e);		
+			super.handleConnect(e);
 		}
 		
 		override protected function handleClose(e:Event):void
@@ -63,11 +63,9 @@ package net.gimite.flashsocket
 			var result:ByteArray = decoder.decode(readable);
 			
 			Logger.info('data', readable);
-			Logger.info('data', ByteArrayUtil.toArrayString(readable));
 			
 			Logger.info('length', length);
 			Logger.info('decode', result);
-			Logger.info('decode', ByteArrayUtil.toArrayString(result));
 			
 			return result;
 		}
@@ -75,12 +73,10 @@ package net.gimite.flashsocket
 		override protected function processWritable(writable:ByteArray):ByteArray
 		{
 			Logger.info('writable', writable);
-			Logger.info('writable', ByteArrayUtil.toArrayString(writable));
 			
 			var result:ByteArray =  encoder.encode(writable);
 			
 			Logger.info('snappy-encoded', result);
-			Logger.info('snappy-encoded', ByteArrayUtil.toArrayString(result));
 			
 			return super.processWritable(result);
 			//super.processWritable();
