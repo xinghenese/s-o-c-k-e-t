@@ -1,4 +1,5 @@
 package net.gimite.snappy {
+	import net.gimite.hellman.KeyExchange;
 	import com.hurlant.util.Base64;
 	import flash.utils.ByteArray;
 	import com.hurlant.math.BigInteger;
@@ -20,7 +21,7 @@ package net.gimite.snappy {
 		public function HellmanTest(){
 			Logger.log('Welcome');
 			
-			var hellman:Hellman = new Hellman();
+			var hellman:KeyExchange = new Hellman();
 			
 			pbk = hellman.getPublicKey();
 			Logger.info('base64-encoded-public-key', pbk);
@@ -37,7 +38,7 @@ package net.gimite.snappy {
 			Logger.info('pbkBytesFromServer', pbkBytesFromServer);
 			Logger.info('pbkBytesFromServer.position', pbkBytesFromServer.position);
 			
-			var RCkey:String = hellman.getRCKey(pbkBytesFromServer);
+			var RCkey:String = hellman.getEncryptKey(pbkBytesFromServer);
 			
 			Logger.info('RCKey', RCkey);
 			

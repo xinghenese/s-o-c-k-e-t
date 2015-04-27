@@ -1,8 +1,9 @@
 package net.gimite.entry
 {
+	import net.gimite.connection.ClientConnection;
 	import net.gimite.packet.AuthenticateProtocolPacket;
 	import net.gimite.packet.ProtocolPacket;
-	import net.gimite.connection.ConnectionTest;
+	import net.gimite.connection.AbstractConnection;
 	import flash.display.Sprite;
 	/**
 	 * @author Administrator
@@ -20,7 +21,8 @@ package net.gimite.entry
 				devn: "Sony Xperia Z - 4.2.2 - API 17 - 1080x1920_e4165df6-a6d8-4873-a5ea-d433085fb120", 
 				msuid: "30147510"
 			});
-			ConnectionTest.instance.request(packet);
+//			AbstractConnection.instance.request(packet);
+			ClientConnection.instance.request(packet);
 		}
 	}
 }

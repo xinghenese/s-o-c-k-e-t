@@ -16,7 +16,7 @@ package net.gimite.hellman
 		public static const KEY_LENGTH:uint = 32;
 		
 		private var _rc4:RC4Entity = null;
-		private var _hellman:Hellman = null;
+		private var _hellman:KeyExchange = null;
 		private var _key:ByteArray = null;
 		
 		public function RC4Encrypt(enforcer:SingletonEnforcer)
@@ -47,7 +47,7 @@ package net.gimite.hellman
 			_enable = enable;
 		}
 		
-//		public function generateKeyPair():Hellman
+//		public function generateKeyPair():KeyExchange
 //		{
 //			return new Hellman();
 //		}

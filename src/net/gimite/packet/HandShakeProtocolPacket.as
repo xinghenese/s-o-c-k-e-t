@@ -1,5 +1,6 @@
 package net.gimite.packet
 {
+	import net.gimite.hellman.KeyExchange;
 	import net.gimite.connection.Connection;
 	import net.gimite.hellman.RC4Encrypt;
 	import flash.utils.ByteArray;
@@ -12,32 +13,18 @@ package net.gimite.packet
 	 */
 	public class HandShakeProtocolPacket extends ProtocolPacket
 	{
-		private var _hellman:Hellman = null;
+		private var keyExchange:KeyExchange = null;
 		
 		public function HandShakeProtocolPacket()
 		{
-			super(hellman.getPublicKey());
+			keyExchange = new Hellman();
+			super(keyExchange.getPublicKey());
 		}
 		
 		override public function process():void
 		{
 			generateEncryptKey();
 			sendInitPacket();
-		}
-		
-		private function getLocalKey():String
-		{
-			var lkey:String = hellman.getPublicKey();
-			Logger.info('localkey', lkey);
-			return lkey;
-		}
-		
-		private function get hellman():Hellman
-		{
-			if(_hellman == null){
-				_hellman = new Hellman();
-			}
-			return _hellman;
 		}
 		
 		private function generateEncryptKey():void
@@ -50,7 +37,7 @@ package net.gimite.packet
 			Logger.info('pbk', pbk);
 			var pbkBytes:ByteArray = Base64.decodeToByteArray(pbk);
 			Logger.info('pbk-decoded', ByteArrayUtil.toArrayString(pbkBytes));
-			var key:String = hellman.getRCKey(pbkBytes);
+			var key:String = keyExchange.getEncryptKey(pbkBytes);
 			Logger.info('gen-key', key);
 			encryptkey = key;
 		}

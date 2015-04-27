@@ -1,8 +1,10 @@
-package net.gimite.flashsocket
+package net.gimite.offlineflashsocket
 {
+	import net.gimite.connection.ServerConnection;
+	import net.gimite.connection.ClientConnection;
 	import net.gimite.logger.Logger;
 	import flash.utils.ByteArray;
-	import net.gimite.connection.ConnectionTest;
+	import net.gimite.connection.AbstractConnection;
 	import net.gimite.packet.HandShakeProtocolPacket;
 	import net.gimite.packet.ProtocolPacket;
 	import net.gimite.hellman.RC4Encrypt;
@@ -12,33 +14,39 @@ package net.gimite.flashsocket
 	/**
 	 * @author Administrator
 	 */
-	public class SnappyFlashSocketTest extends EncryptedFlashSocketTest
+	public class SnappyOfflineFlashSocket extends EncryptedOfflineFlashSocket
 	{
 		private var encoder:SnappyFrameEncoder;
 		private var decoder:SnappyFrameDecoder;
 		private var ready:Boolean = false;
 		
-		public function SnappyFlashSocketTest()
+		public function SnappyOfflineFlashSocket(connection:AbstractConnection)
 		{
 			encoder = new SnappyFrameEncoder();
 			decoder = new SnappyFrameDecoder();
-			super();
+			super(connection);
 		}
 		
 		override protected function handleConnect(e:Event):void
 		{
+			if(connection is ServerConnection){
+				fireConnect();
+				return;
+			}
+			super.handleConnect(e);
+//			Logger.log('SnappySocket.handleConnect');
+			SocketLog.log(connection, this, 'handleConnect', e);
 //			var data:String = '<HSK pbk="XHBxevmo8lAe34xM87jE+3dYxfEOhnjqt/Ca2I4PZk9SorG5v+ns4dbEn2vOoUlfScFBIAht0bylxiiBq27y3Ia08aDEYqe6b/x8uuBGfRmuAc9OT4eLFeJsrmmzDzDtTIoWHPnRv9V045oIKVnRN5girx9muphhL/AVSPQ3lGA="></HSK>';
 //			if(!RC4Encrypt.ready || !ready){
 			if(!ready){
-//				var pbk:String = (new Hellman()).getPublicKey();
-//				Logger.info('pbk', pbk);
+////				var pbk:String = (new Hellman()).getPublicKey();
+////				Logger.info('pbk', pbk);
 				Logger.info('ready', ready);
-				ready = true;
+//				ready = true;
 				var packet:ProtocolPacket = new HandShakeProtocolPacket();
-				ConnectionTest.instance.request(packet);
+//				AbstractConnection.instance.request(packet);
+				connection.request(packet);
 			}
-						
-			super.handleConnect(e);
 		}
 		
 		override protected function handleClose(e:Event):void
@@ -68,14 +76,18 @@ package net.gimite.flashsocket
 		
 		override protected function processWritable(writable:ByteArray):ByteArray
 		{
-			Logger.info('writable', writable);
+			var direction:String = ' <= ';
+			if(connection is ServerConnection){
+				direction = ' => ';
+			}
+			Logger.info('writable' + direction, writable);
 			
 			var result:ByteArray =  encoder.encode(writable);
 			
 			Logger.info('snappy-encoded', result);
 			
-			return result;
-//			return super.processWritable(result);
+//			return result;
+			return super.processWritable(result);
 			//super.processWritable();
 		}
 	}

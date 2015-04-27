@@ -11,7 +11,7 @@ package net.gimite.hellman
 	/**
 	 * @author Administrator
 	 */
-	public class Hellman
+	public class Hellman implements KeyExchange
 	{
 		private var p:BigInteger; // public key
     	private var g:BigInteger; // public base
@@ -56,7 +56,7 @@ package net.gimite.hellman
 	     * @param priv
 	     * @return
 	     */
-	    public function  createPub():BigInteger
+	    private function  createPub():BigInteger
 	    {
 	        priv.toString();
 	        return this.g.modPow(priv, this.p);
@@ -65,7 +65,6 @@ package net.gimite.hellman
 	    public function  getPublicKey():String
 	    {
 			return Base64.encodeByteArray(createPub().toByteArray());
-//	        return RC4Encrypt.get().base64Encode(createPub().toByteArray());
 	    }
 	
 	    /**
@@ -80,17 +79,17 @@ package net.gimite.hellman
 	        return pub.modPow(priv, this.p);
 	    }
 	
-	    public function  getRCKey(publicKey:*):String
+	    public function  getEncryptKey(pub:* = null):String
 	    {
-			if(publicKey is String){
-				publicKey = Dec.toArray(Base64.decode(publicKey));
+			if(pub is String){
+				pub = Dec.toArray(Base64.decode(pub));
 			}
-			if(publicKey is ByteArray){
+			if(pub is ByteArray){
 				try
 		        {
-					publicKey.position = 0;
-					Logger.info('publicKey', publicKey);
-		            var bigIntegerWrap:BigInteger = new BigInteger(publicKey, 0, true);
+					pub.position = 0;
+					Logger.info('publicKey', pub);
+		            var bigIntegerWrap:BigInteger = new BigInteger(pub, 0, true);
 					Logger.info('bigIntegerWrap', bigIntegerWrap.toString(16));
 		            var bitIntSecretKey:BigInteger = getShared(bigIntegerWrap);
 					Logger.info('bigIntSecretKey', bitIntSecretKey);

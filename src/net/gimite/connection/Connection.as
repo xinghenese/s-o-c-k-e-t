@@ -40,7 +40,12 @@ package net.gimite.connection
 		public function request(packet:ProtocolPacket):void
 		{
 			var data:ByteArray = ByteArrayUtil.createByteArray(true, packet.toXMLString());
-			socket.write(data);
+			if(socket && socket.connected){
+				socket.write(data);
+			}
+			else{
+							
+			}
 		}
 		
 		public function response(parsed:Object):void

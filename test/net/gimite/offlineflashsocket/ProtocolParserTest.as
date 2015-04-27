@@ -1,6 +1,6 @@
-package net.gimite.flashsocket
+package net.gimite.offlineflashsocket
 {
-	import net.gimite.connection.ConnectionTest;
+	import net.gimite.connection.AbstractConnection;
 	import net.gimite.logger.Logger;
 	import flash.utils.ByteArray;
 	/**
@@ -36,7 +36,7 @@ package net.gimite.flashsocket
 			}
 			finally{
 				if(parsed != null){
-					ConnectionTest.instance.response(parsed);
+					AbstractConnection.instance.response(parsed);
 				}
 			}
 		}

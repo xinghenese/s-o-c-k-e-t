@@ -36,8 +36,7 @@ package net.gimite.flashsocket
 	        addEventListener(Event.CONNECT, handleConnect);
 	        addEventListener(IOErrorEvent.IO_ERROR, handleIOError);
 	        addEventListener(SecurityErrorEvent.SECURITY_ERROR, handleSecurityError);
-	        addEventListener(ProgressEvent.SOCKET_DATA, handleSocketData);
-			
+	        addEventListener(ProgressEvent.SOCKET_DATA, handleSocketData);			
 		}
 		
 		private function loadPolicyFile(host:String, port:uint = 843):void
@@ -90,7 +89,7 @@ package net.gimite.flashsocket
 			if(connected){
 				writeBytes(processWritable(writable));
 				flush();
-			}			
+			}
 		}
 		
 		protected function processWritable(writable:ByteArray):ByteArray
