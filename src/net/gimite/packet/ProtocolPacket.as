@@ -15,7 +15,6 @@ package net.gimite.packet
 		protected var _data:Object = {};
 		protected var _keyname:String = '';
 		
-		
 		public function ProtocolPacket(data:* = null)
 		{
 			var clzName:String = getQualifiedClassName(this);

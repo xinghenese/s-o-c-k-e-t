@@ -46,11 +46,6 @@ package net.gimite.offlineflashsocket
 		{
 			state = State.CONNECTED;
 			SocketLog.log(connection, this, 'onConnect', e.toString());
-//			if(connection is ServerConnection){
-//				fireConnect();
-//				return;
-//			}
-//			Logger.info("onConnect", e.toString());
 		}
 		
 		/**
@@ -61,7 +56,6 @@ package net.gimite.offlineflashsocket
 		{
 			state = State.CLOSED;
 			SocketLog.log(connection, this, 'onClose', e.toString());
-//			Logger.info("onClose", e.toString());
 		}
 		
 		/**
@@ -71,7 +65,6 @@ package net.gimite.offlineflashsocket
 		protected function handleError(e:Event):void
 		{
 			SocketLog.log(connection, this, 'onError', e.toString());
-//			Logger.info("onError", e.toString());
 			fireClose();
 		}
 		
@@ -81,10 +74,7 @@ package net.gimite.offlineflashsocket
 		 */	
 		private function handleData(e:Event):void
 		{
-//			var d:ByteArray = readReponse(e);
 			SocketLog.log(connection, this, 'onData', readReponse(e));
-//			Logger.info("position", d.position);
-//			Logger.info('length', d.length);
 			parser.parse(processReadable(readReponse(e)));
 		}		
 		
@@ -98,7 +88,6 @@ package net.gimite.offlineflashsocket
 		public function connect(callback:Function = null/*, once:Boolean = true*/):void
 		{
 			SocketLog.log(connection, this, 'connect', 'state = ' + state);
-//			Logger.info('socket-state', state);
 
 			if(connection is ServerConnection){
 				return;
@@ -106,21 +95,15 @@ package net.gimite.offlineflashsocket
 
 			if(state == State.NONE || state == State.CLOSED){
 				SocketLog.log(connection, this, 'connect-1', 'state = ' + state);
-//				Logger.log('connect1');
-				Logger.info('callback', callback);
 				once(FlashSocketEvent.CONNECT, callback);
 				fireConnect();
 			}
 			else if(state == State.CONNECTING){
 				SocketLog.log(connection, this, 'connect-2', 'state = ' + state);
-//				Logger.log('connect2');
-				Logger.info('callback', callback);
 				once(FlashSocketEvent.CONNECT, callback);
 			}
 			else if(state == State.CONNECTED){
 				SocketLog.log(connection, this, 'connect-3', 'state = ' + state);
-//				Logger.log('connect3');
-				Logger.info('callee', arguments.callee);
 				callback(null);
 			}
 		}

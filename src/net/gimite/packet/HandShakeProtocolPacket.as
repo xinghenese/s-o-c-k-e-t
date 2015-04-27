@@ -46,13 +46,13 @@ package net.gimite.packet
 		{
 			Logger.log('sendInitPacket');
 			var packet:ProtocolPacket = new AuthenticateProtocolPacket({
-				ver: "3.8.15.1",
+				msuid: "30032005",
 				zip: "1",
-				dev: "1", 
-				v: "1.0", 
-				token: "csyKLiEOLLTHWeBCWhEYIYP1XHX29zXkNxeGpDiu4AZ8m_u_rvOAs0rahTj1Gp5ME3IRoPORJXm5ISBjin1tOcf6qfjXFg2C60RXywN9xgYrozz1RV5ZODstLkbXeQNOumv1GdiBGQU_F-UZDgaKfSgQkxg16d2vC3L3qnRSEYA", 
-				devn: "Sony Xperia Z - 4.2.2 - API 17 - 1080x1920_e4165df6-a6d8-4873-a5ea-d433085fb120", 
-				msuid: "30147510"				
+				v: "1.0",
+				ver: "4.1",
+				dev: "1",
+				token: "DXIBNW4Z_llL-lfbLUv51PS39jrO1ihZ51xxskjsxsenPk4XQpo5Djs55i2utFHC-DNiC7XwVss0OjMe19BF6xTz7SqiaJv3TENs4GFS_kkjFQYojUUps8qbZ4o-Yd6EJUqMWMf6BZcodrqL1EQP__JmCQJFq3DqNjPNS4OdxTs", 
+				devn: "Sony Xperia Z - 4.2.2 - API 17 - 1080x1920_b0c56658-4c96-419d-aaba-68cc2ceb750d"
 			});
 			Connection.instance.request(packet);
 		}

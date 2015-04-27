@@ -30,14 +30,13 @@ package net.gimite.flashsocket
 		override protected function handleConnect(e:Event):void
 		{
 //			var data:String = '<HSK pbk="XHBxevmo8lAe34xM87jE+3dYxfEOhnjqt/Ca2I4PZk9SorG5v+ns4dbEn2vOoUlfScFBIAht0bylxiiBq27y3Ia08aDEYqe6b/x8uuBGfRmuAc9OT4eLFeJsrmmzDzDtTIoWHPnRv9V045oIKVnRN5girx9muphhL/AVSPQ3lGA="></HSK>';
+			super.handleConnect(e);
 			if(!RC4Encrypt.ready){
 //				var pbk:String = (new Hellman()).getPublicKey();
 //				Logger.info('pbk', pbk);
 				var packet:ProtocolPacket = new HandShakeProtocolPacket();
 				Connection.instance.request(packet);
 			}
-						
-			super.handleConnect(e);
 		}
 		
 		override protected function handleClose(e:Event):void
@@ -77,6 +76,10 @@ package net.gimite.flashsocket
 			var result:ByteArray =  encoder.encode(writable);
 			
 			Logger.info('snappy-encoded', result);
+			
+			var test:ByteArray = decoder.decode(result);
+			
+			Logger.info('snappy-decoded', test);
 			
 			return super.processWritable(result);
 			//super.processWritable();

@@ -16,11 +16,6 @@ package net.gimite.flashsocket
 			super(host, port);
 		}
 		
-		override protected function handleConnect(e:Event):void
-		{
-			
-		}
-		
 		override protected function processReadable(readable:ByteArray):ByteArray
 		{
 			readable = super.processReadable(readable);
@@ -38,8 +33,9 @@ package net.gimite.flashsocket
 		override protected function processWritable(writable:ByteArray):ByteArray
 		{
 			if(RC4Encrypt.ready){
-				Logger.info('RC4Encrypted', RC4Encrypt.instance.RC4(writable));
-				return super.processWritable(RC4Encrypt.instance.RC4(writable));
+				var bytes:ByteArray = RC4Encrypt.instance.RC4(writable);
+				Logger.info('RC4Encrypted', bytes);
+				return super.processWritable(bytes);
 			}
 			return super.processWritable(writable);
 		}
