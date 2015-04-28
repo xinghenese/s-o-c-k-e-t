@@ -29,16 +29,16 @@ package net.gimite.packet
 		
 		private function generateEncryptKey():void
 		{
-			Logger.log();
-			Logger.log('generateEncryptKey');
-			Logger.info('parsed', toJSONString());
-			Logger.info('parsed', toXMLString());
+//			Logger.log();
+//			Logger.log('generateEncryptKey');
+//			Logger.info('parsed', toJSONString());
+//			Logger.info('parsed', toXMLString());
 			var pbk:String = getData('pbk');
-			Logger.info('pbk', pbk);
+//			Logger.info('pbk', pbk);
 			var pbkBytes:ByteArray = Base64.decodeToByteArray(pbk);
-			Logger.info('pbk-decoded', ByteArrayUtil.toArrayString(pbkBytes));
+//			Logger.info('pbk-decoded', ByteArrayUtil.toArrayString(pbkBytes));
 			var key:String = keyExchange.getEncryptKey(pbkBytes);
-			Logger.info('gen-key', key);
+//			Logger.info('gen-key', key);
 			encryptkey = key;
 		}
 		

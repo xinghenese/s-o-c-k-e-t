@@ -1,5 +1,6 @@
 package net.gimite.packet
 {
+	import net.gimite.bridge.ScriptBridge;
 	import com.hurlant.util.der.Set;
 	import flash.utils.getDefinitionByName;
 	import flash.utils.getQualifiedClassName;
@@ -13,7 +14,7 @@ package net.gimite.packet
 		
 		protected var _name:String = "UNTITLED";
 		protected var _data:Object = {};
-		protected var _keyname:String = '';
+		protected var _keyname:String = 'msuid';
 		
 		public function ProtocolPacket(data:* = null)
 		{
@@ -96,6 +97,11 @@ package net.gimite.packet
 		public function process():void
 		{
 			
+		}
+		
+		protected function notifyJSBridge(data:Object):void
+		{
+			ScriptBridge.instance.fire(new ProtocolEvent(ProtocolEvent.SUCCESS, data));
 		}
 		
 		protected final function reset():ProtocolPacket

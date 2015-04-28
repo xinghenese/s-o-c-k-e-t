@@ -15,7 +15,7 @@ package net.gimite.connection
 		
 		private var socket:FlashSocket = null;
 		private var host:Array = ["192.168.0.110", "192.168.1.66", "192.168.1.67", "192.168.1.68", "192.168.0.66", "192.168.0.67", "192.168.0.68"];
-		private var ordinal:int = 4;
+		private var ordinal:int = 1;
 		
 		public function Connection(enforcer:SingletonEnforcer)
 		{
@@ -37,9 +37,9 @@ package net.gimite.connection
 			}
 		}
 		
-		public function request(packet:ProtocolPacket):void
+		public function request(packet:ProtocolPacket, xml:Boolean = false):void
 		{
-			var data:ByteArray = ByteArrayUtil.createByteArray(true, packet.toXMLString());
+			var data:ByteArray = ByteArrayUtil.createByteArray(true, xml ? packet.toXMLString() : packet.toJSONString());
 			if(socket && socket.connected){
 				socket.write(data);
 			}
@@ -56,7 +56,7 @@ package net.gimite.connection
 				packet.fillData(parsed.data);
 				Logger.info('packet not null');
 				packet.process();
-			}			
+			}		
 		}
 	}
 }

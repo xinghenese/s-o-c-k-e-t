@@ -17,7 +17,7 @@ package net.gimite.flashsocket
 			readable = super.processReadable(readable);
 			
 			var length:int = readable.readUnsignedInt();
-			Logger.info('PayloadSocket-processReadable.length', length);
+//			Logger.info('PayloadSocket-processReadable.length', length);
 			var result:ByteArray = new ByteArray();
 			readable.readBytes(result);
 			return result;
@@ -28,6 +28,7 @@ package net.gimite.flashsocket
 			var result:ByteArray = new ByteArray();
 			result.writeInt(writable.length);
 			result.writeBytes(writable);
+//			Logger.info('result-payload', result);
 			return super.processWritable(result);
 		}
 	}

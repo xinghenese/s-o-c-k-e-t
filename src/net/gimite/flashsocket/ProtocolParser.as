@@ -29,7 +29,8 @@ package net.gimite.flashsocket
 			var raw:String = data.toString();
 			var parsed:Object = null;
 			try{
-				parsed = parseXML(raw);
+				parsed = parseJSON(raw);
+//				parsed = parseXML(raw);
 			}
 			catch(e:Error){
 				parsed = parseJSON(raw);
@@ -43,7 +44,15 @@ package net.gimite.flashsocket
 		
 		private function parseJSON(data:String):Object
 		{
-			return JSON.parse(data);
+			var objData:Object = JSON.parse(data);
+			for(var key in objData){
+				return {
+					name: key,
+					data: objData[key]
+				}
+			}
+			return null;
+//			return JSON.parse(data);
 		}
 		
 		private function parseXML(data:String):Object

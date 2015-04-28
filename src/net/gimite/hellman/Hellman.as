@@ -88,12 +88,12 @@ package net.gimite.hellman
 				try
 		        {
 					pub.position = 0;
-					Logger.info('publicKey', pub);
+//					Logger.info('publicKey', pub);
 		            var bigIntegerWrap:BigInteger = new BigInteger(pub, 0, true);
-					Logger.info('bigIntegerWrap', bigIntegerWrap.toString(16));
+//					Logger.info('bigIntegerWrap', bigIntegerWrap.toString(16));
 		            var bitIntSecretKey:BigInteger = getShared(bigIntegerWrap);
-					Logger.info('bigIntSecretKey', bitIntSecretKey);
-					Logger.info('base64-encoded-privateKey', Base64.encodeByteArray(bitIntSecretKey.toByteArray()));
+//					Logger.info('bigIntSecretKey', bitIntSecretKey);
+//					Logger.info('base64-encoded-privateKey', Base64.encodeByteArray(bitIntSecretKey.toByteArray()));
 		            return MD5.hash(Base64.encodeByteArray(bitIntSecretKey.toByteArray()));
 		        }
 		        catch (e:Error)

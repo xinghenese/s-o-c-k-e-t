@@ -12,18 +12,18 @@ package net.gimite.flashsocket
 	{
 		public function EncryptedFlashSocket(host:String = null, port:uint = 80):void
 		{
-			Logger.log('EncryptedFlashSocket');
+//			Logger.log('EncryptedFlashSocket');
 			super(host, port);
 		}
 		
 		override protected function processReadable(readable:ByteArray):ByteArray
 		{
 			readable = super.processReadable(readable);
-			Logger.log('EncryptSocket.processReadable');
+//			Logger.log('EncryptSocket.processReadable');
 			
 			if(RC4Encrypt.ready){
 				var encrypted:ByteArray = RC4Encrypt.instance.RC4(readable);
-				Logger.info('RC4Decrypted', encrypted);
+//				Logger.info('RC4Decrypted', encrypted);
 				return encrypted;
 //				return super.processReadable(RC4Encrypt.instance.RC4(readable));
 			}
@@ -34,7 +34,7 @@ package net.gimite.flashsocket
 		{
 			if(RC4Encrypt.ready){
 				var bytes:ByteArray = RC4Encrypt.instance.RC4(writable);
-				Logger.info('RC4Encrypted', bytes);
+//				Logger.info('RC4Encrypted', bytes);
 				return super.processWritable(bytes);
 			}
 			return super.processWritable(writable);

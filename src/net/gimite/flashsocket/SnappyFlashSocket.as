@@ -56,15 +56,15 @@ package net.gimite.flashsocket
 		
 		override protected function processReadable(readable:ByteArray):ByteArray
 		{
-			Logger.log('SnappySocket.processReadable');
+//			Logger.log('SnappySocket.processReadable');
 			readable = super.processReadable(readable);
 			
 			var result:ByteArray = decoder.decode(readable);
 			
-			Logger.info('data', readable);
+//			Logger.info('data', readable);
 			
-			Logger.info('length', length);
-			Logger.info('decode', result);
+//			Logger.info('length', length);
+//			Logger.info('decode', result);
 			
 			return result;
 		}
@@ -75,11 +75,11 @@ package net.gimite.flashsocket
 			
 			var result:ByteArray =  encoder.encode(writable);
 			
-			Logger.info('snappy-encoded', result);
+//			Logger.info('snappy-encoded', result);
 			
 			var test:ByteArray = decoder.decode(result);
 			
-			Logger.info('snappy-decoded', test);
+//			Logger.info('snappy-decoded', test);
 			
 			return super.processWritable(result);
 			//super.processWritable();

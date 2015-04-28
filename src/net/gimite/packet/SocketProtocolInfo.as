@@ -10,7 +10,8 @@ package net.gimite.packet
 		
 		private static const names:Object = {
 			HandShakeProtocolPacket: 'HSK',
-			AuthenticateProtocolPacket: 'Auth'
+			AuthenticateProtocolPacket: 'Auth',
+			PingProtocolPacket: 'Ping'
 		};
 		
 		private static const keys:Object = {

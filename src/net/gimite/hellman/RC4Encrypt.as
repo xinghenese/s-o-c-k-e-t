@@ -54,7 +54,6 @@ package net.gimite.hellman
 		
 		public function set encryptkey(key:String):void
 		{
-			Logger.info('key', key);
 			_key = ByteArrayUtil.createByteArray(true, key);
 			_rc4 = new RC4Entity(_key);
 			_ready = true;
