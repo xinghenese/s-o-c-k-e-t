@@ -45,7 +45,7 @@ package net.gimite.packet
 		private function sendInitPacket():void
 		{
 			Logger.log('sendInitPacket');
-			var packet:ProtocolPacket = new AuthenticateProtocolPacket({
+			var packet:ProtocolPacket = ProtocolPacketManager.instance.createAuthenticateProtocolPacket({
 				msuid: "30032005",
 				zip: "1",
 				v: "1.0",

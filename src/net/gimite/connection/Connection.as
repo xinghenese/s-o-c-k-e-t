@@ -1,5 +1,6 @@
 package net.gimite.connection
 {
+	import net.gimite.packet.ProtocolPacketManager;
 	import net.gimite.logger.Logger;
 	import flash.utils.ByteArray;
 	import net.gimite.util.ByteArrayUtil;
@@ -15,7 +16,7 @@ package net.gimite.connection
 		
 		private var socket:FlashSocket = null;
 		private var host:Array = ["192.168.0.110", "192.168.1.66", "192.168.1.67", "192.168.1.68", "192.168.0.66", "192.168.0.67", "192.168.0.68"];
-		private var ordinal:int = 1;
+		private var ordinal:int = 4;
 		
 		public function Connection(enforcer:SingletonEnforcer)
 		{
@@ -37,7 +38,7 @@ package net.gimite.connection
 			}
 		}
 		
-		public function request(packet:ProtocolPacket, xml:Boolean = false):void
+		public function request(packet:ProtocolPacket, xml:Boolean = true):void
 		{
 			var data:ByteArray = ByteArrayUtil.createByteArray(true, xml ? packet.toXMLString() : packet.toJSONString());
 			if(socket && socket.connected){
@@ -51,7 +52,7 @@ package net.gimite.connection
 		public function response(parsed:Object):void
 		{
 			Logger.info('Connection.reponse', JSON.stringify(parsed));
-			var packet:ProtocolPacket = ProtocolPacket.refretchPacket(parsed.name);
+			var packet:ProtocolPacket = ProtocolPacketManager.instance.createProtocolPacket(parsed.name);
 			if(packet != null){
 				packet.fillData(parsed.data);
 				Logger.info('packet not null');

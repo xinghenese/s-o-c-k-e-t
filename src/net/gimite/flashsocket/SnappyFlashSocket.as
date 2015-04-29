@@ -1,5 +1,6 @@
 package net.gimite.flashsocket
 {
+	import net.gimite.packet.ProtocolPacketManager;
 	import net.gimite.connection.Connection;
 	import net.gimite.hellman.RC4Encrypt;
 	import net.gimite.packet.HandShakeProtocolPacket;
@@ -34,7 +35,7 @@ package net.gimite.flashsocket
 			if(!RC4Encrypt.ready){
 //				var pbk:String = (new Hellman()).getPublicKey();
 //				Logger.info('pbk', pbk);
-				var packet:ProtocolPacket = new HandShakeProtocolPacket();
+				var packet:ProtocolPacket = ProtocolPacketManager.instance.createHandShakeProtocolPacket();
 				Connection.instance.request(packet);
 			}
 		}

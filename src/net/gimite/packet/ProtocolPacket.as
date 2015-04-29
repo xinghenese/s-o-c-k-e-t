@@ -1,26 +1,27 @@
 package net.gimite.packet
 {
 	import net.gimite.bridge.ScriptBridge;
-	import com.hurlant.util.der.Set;
 	import flash.utils.getDefinitionByName;
 	import flash.utils.getQualifiedClassName;
-	import net.gimite.logger.Logger;
 	/**
 	 * @author Administrator
 	 */
 	public class ProtocolPacket
 	{
 		private static var _packets:Vector.<ProtocolPacket> = new Vector.<ProtocolPacket>();
+		private static const NOT_EXIST:int = -1;
 		
 		protected var _name:String = "UNTITLED";
 		protected var _data:Object = {};
 		protected var _keyname:String = 'msuid';
 		
+		private var _index:int = NOT_EXIST;
+		
 		public function ProtocolPacket(data:* = null)
 		{
 			var clzName:String = getQualifiedClassName(this);
-			_name = SocketProtocolInfo.getName(clzName) || _name;
-			_keyname = SocketProtocolInfo.getKey(clzName) || _keyname;
+			_name = SocketProtocolInfo.getTagName(this) || _name;
+			_keyname = SocketProtocolInfo.getKey(this) || _keyname;
 			if(data != null){
 				if(data is String && _keyname){
 					fillData(_keyname, data);
@@ -29,7 +30,7 @@ package net.gimite.packet
 					fillData(data);
 				}
 			}
-			_packets.push(this);
+			_index = _packets.push(this) - 1;
 		}
 		
 		public static function refretchPacket(name:String):ProtocolPacket
@@ -41,18 +42,25 @@ package net.gimite.packet
 			if(clzName == null){
 				return null;
 			}
+			var packet:ProtocolPacket = findPacket(clzName);
+			if(packet != null){
+				return packet.reset();
+			}
+			return null;
+		}
+		
+		private static function findPacket(clzName:String):ProtocolPacket
+		{
 			var clazz:Class = getDefinitionByName(clzName) as Class;
 			for(var i:uint = 0, length:uint = _packets.length; i < length; i ++){
 				if(_packets[i] is clazz){
-					Logger.log('fetched');
-					return _packets[i].reset();
+					return _packets[i];
 				}
 			}
 			return null;
-//			return new clazz();
 		}
 		
-		public static function createPacket2(name:String):ProtocolPacket
+		public static function createPacket(name:String):ProtocolPacket
 		{
 			var clzName:String = SocketProtocolInfo.getClassNameByTagName(name);
 			if(clzName == null){
@@ -77,21 +85,28 @@ package net.gimite.packet
 			return _data[key];
 		}
 		
-		public final function fillData(key:*, value:String = ''):void
+		public final function fillData(key:*, value:String = ''):ProtocolPacket
 		{
 			if(key){
 				if(value){
 					_data[key] = value;
 				}
+				else if(key is String && _keyname){
+					_data[_keyname] = key;
+				}
 				else if(key is Object){
-//					for(var prop in key){
-//						if(key.hasOwnProperty(prop)){
-//							_data[prop] = key[prop];
-//						}						
-//					}
 					_data = key;
 				}
-			}					
+			}
+			return this;				
+		}
+		
+		public function serialize(json:Boolean = true):String
+		{
+			if(json){
+				return toJSONString();
+			}
+			return toXMLString();
 		}
 		
 		public function process():void
@@ -99,12 +114,17 @@ package net.gimite.packet
 			
 		}
 		
+		protected function dispose():void
+		{
+			ProtocolPacketManager.instance.removePacket(this);
+		}
+		
 		protected function notifyJSBridge(data:Object):void
 		{
 			ScriptBridge.instance.fire(new ProtocolEvent(ProtocolEvent.SUCCESS, data));
 		}
 		
-		protected final function reset():ProtocolPacket
+		public final function reset():ProtocolPacket
 		{
 			_data = {};
 			return this;

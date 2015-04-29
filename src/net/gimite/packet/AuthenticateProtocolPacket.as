@@ -31,7 +31,7 @@ package net.gimite.packet
 
 					Logger.info('data.msqid', _data.msqsid);
 					
-					Connection.instance.request(new PingProtocolPacket({
+					Connection.instance.request(ProtocolPacketManager.instance.createAuthenticateProtocolPacket({
 						msuid: "30032005",
 						msqid: Authentication.instance.getSequenceKey()
 					}));
