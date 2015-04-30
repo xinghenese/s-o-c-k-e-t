@@ -6,20 +6,14 @@ package net.gimite.packet
 	 */
 	public class ProtocolPacketManager
 	{
-		static private const prefix:String = 'net.gimite.packet::';
-		static private const tagNames:Object = {
-			HandShakeProtocolPacket: 'HSK',
-			AuthenticateProtocolPacket: 'Auth',
-			PingProtocolPacket: 'Ping'
-		};		
-		static private const keys:Object = {
-			HandShakeProtocolPacket: 'pbk'
+		static private const reusable:Object = {
+			
 		};
 		
 		/*********************************************************************************/
 		
 		private static var INSTANCE:ProtocolPacketManager = null;
-		private var packets:ProtocolPacketPool = null; 
+		private var packets:ProtocolPacketPool = null;
 		
 		public function ProtocolPacketManager(enforcer:SingletonEnforcer)
 		{
@@ -44,44 +38,24 @@ package net.gimite.packet
 		public function createProtocolPacket(tag:String, data:* = null):ProtocolPacket
 		{
 			Logger.info('tag', tag);
-			var clzName:String = getClassNameByTagName(tag);
+			var clzName:String = SocketProtocolInfo.getClassNameByTagName(tag);
 			Logger.info('clzName', clzName);
 			return packets.fetchPacket(clzName, data);
 		}
 		
 		public function createHandShakeProtocolPacket(data:* = null):ProtocolPacket
 		{
-			return createProtocolPacket(SocketProtocolInfo.HandShakeProtocolPacketTag, data);
+			return createProtocolPacket(SocketProtocolInfo.HandShakeProtocolPacket, data);
 		}
 		
 		public function createAuthenticateProtocolPacket(data:* = null):ProtocolPacket
 		{
-			return createProtocolPacket(SocketProtocolInfo.AuthenticateProtocolPacketTag, data);
+			return createProtocolPacket(SocketProtocolInfo.AuthenticateProtocolPacket, data);
 		}
 		
 		public function createPingProtocolPacket(data:* = null):ProtocolPacket
 		{
-			return createProtocolPacket(SocketProtocolInfo.PingProtocolPacketTag, data);
-		}
-		
-		private static function getPrimaryKey():void
-		{
-			
-		}
-		
-		private static function getClassNameByTagName(name:String):String
-		{
-			if(name in tagNames){
-				return prefix + name;
-			}
-			for(var key in tagNames){
-				if(tagNames.hasOwnProperty(key)){
-					if(tagNames[key] == name){
-						return prefix + key;
-					}
-				}
-			}
-			return null;
+			return createProtocolPacket(SocketProtocolInfo.PingProtocolPacket, data);
 		}
 	}
 }

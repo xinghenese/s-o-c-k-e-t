@@ -25,6 +25,11 @@ package net.gimite.bridge
 			return INSTANCE;
 		}
 		
+		public function exposeToJS(name:String, callback:Function):void
+		{
+			ExternalInterface.addCallback(name, callback);
+		}
+		
 		public function notifyJS(event:Event):void
 		{
 			ExternalInterface.call('protocol', (event as ProtocolEvent).message);

@@ -1,8 +1,8 @@
 package net.gimite.packet
 {
+	import net.gimite.crypto.IHash;
+	import net.gimite.crypto.RSAHash;
 	import net.gimite.logger.Logger;
-	import net.gimite.util.RSAHash;
-	import net.gimite.util.CodeHash;
 	/**
 	 * @author Reco
 	 */
@@ -14,7 +14,7 @@ package net.gimite.packet
 	    private var sequence:Number = INVALID_SEQUENCE; //AtomicLong
 		
 		private static var INSTANCE:Authentication = null;
-		private var authHash:CodeHash = null;
+		private var authHash:IHash = null;
 	
 	    public function Authentication(enforcer:SingletonEnforcer)
 	    {

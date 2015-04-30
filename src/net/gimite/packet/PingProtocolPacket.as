@@ -24,7 +24,7 @@ package net.gimite.packet
 		
 		private function sendPingPacket():void
 		{
-			var packet:ProtocolPacket = ProtocolPacket.refretchPacket('Ping');
+			var packet:ProtocolPacket = ProtocolPacketManager.instance.createPingProtocolPacket();
 			if(packet != null){
 				packet.fillData({
 					msuid: "30032005",

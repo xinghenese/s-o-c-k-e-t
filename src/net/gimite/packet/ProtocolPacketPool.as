@@ -46,9 +46,11 @@ package net.gimite.packet
 		{
 			try{
 				var packet:ProtocolPacket = findPacket(clzName);
-				Logger.info('packet is HSK', packet is HandShakeProtocolPacket);
-				Logger.info('packet is null', packet == null);
 				if(packet != null){
+					//remove the one-off packet from the packets pool
+					if(!SocketProtocolInfo.isReusable(clzName)){
+						removePacket(packet);
+					}
 					return packet.reset().fillData(data);
 				}
 				var clazz:Class = getDefinitionByName(clzName) as Class;
@@ -60,6 +62,7 @@ package net.gimite.packet
 				Logger.error(e);
 				return null;
 			}
+			
 			return null;
 		}
 		
@@ -74,22 +77,18 @@ package net.gimite.packet
 		private function findPacket(clzName:String):ProtocolPacket
 		{
 			var clazz:Class = getDefinitionByName(clzName) as Class; //maybe throw ReferenceError
-			
-			//TestBlock
-			var p:ProtocolPacket = new HandShakeProtocolPacket();
-			Logger.info('p is HandShakeProtocolPacket', p is clazz);
-			//
-			
 			var length:uint = _packets.length;
+			Logger.info('packets', _packets);
+			
 			if(length == 0){
 				return null;
 			}	
 			for(var i:uint = 0; i < length; i ++){
 				if(_packets[i] is clazz){
-					Logger.info('i', i);
 					return _packets[i];
 				}
 			}
+			
 			return null;
 		}
 	}

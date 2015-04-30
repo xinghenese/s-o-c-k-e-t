@@ -1,23 +1,27 @@
 package net.gimite.packet
 {
-	import net.gimite.hellman.KeyExchange;
-	import net.gimite.connection.Connection;
-	import net.gimite.hellman.RC4Encrypt;
-	import flash.utils.ByteArray;
-	import net.gimite.hellman.Hellman;
-	import net.gimite.util.ByteArrayUtil;
+	import net.gimite.bridge.ScriptBridge;
 	import com.hurlant.util.Base64;
+	import flash.utils.ByteArray;
+	import net.gimite.connection.Connection;
+	import net.gimite.crypto.Crypto;
+	import net.gimite.crypto.Hellman;
+	import net.gimite.crypto.RC4Encrypt;
+	import net.gimite.hellman.KeyExchange;
 	import net.gimite.logger.Logger;
+	import net.gimite.util.ByteArrayUtil;
 	/**
 	 * @author Reco
 	 */
 	public class HandShakeProtocolPacket extends ProtocolPacket
 	{
-		private var keyExchange:KeyExchange = null;
+		private var keyExchange:KeyExchange;
+		private var crypto:Crypto;
 		
-		public function HandShakeProtocolPacket()
+		public function HandShakeProtocolPacket(data:* = null)
 		{
 			keyExchange = new Hellman();
+			crypto = RC4Encrypt.instance;
 			super(keyExchange.getPublicKey());
 		}
 		
@@ -29,17 +33,12 @@ package net.gimite.packet
 		
 		private function generateEncryptKey():void
 		{
-//			Logger.log();
-//			Logger.log('generateEncryptKey');
-//			Logger.info('parsed', toJSONString());
-//			Logger.info('parsed', toXMLString());
 			var pbk:String = getData('pbk');
-//			Logger.info('pbk', pbk);
 			var pbkBytes:ByteArray = Base64.decodeToByteArray(pbk);
-//			Logger.info('pbk-decoded', ByteArrayUtil.toArrayString(pbkBytes));
 			var key:String = keyExchange.getEncryptKey(pbkBytes);
-//			Logger.info('gen-key', key);
-			encryptkey = key;
+			encryptKey = key;
+			ScriptBridge.instance.exposeToJS('encrypt', crypto.encrypt);
+			ScriptBridge.instance.exposeToJS('decrypt', crypto.decrypt);
 		}
 		
 		private function sendInitPacket():void
@@ -57,9 +56,10 @@ package net.gimite.packet
 			Connection.instance.request(packet);
 		}
 		
-		private function set encryptkey(key:String):void
+		private function set encryptKey(key:String):void
 		{
-			RC4Encrypt.instance.encryptkey = key.length > RC4Encrypt.KEY_LENGTH ? key.substring(0, RC4Encrypt.KEY_LENGTH) : key;
+			key = key.length > crypto.KEY_LENGTH ? key.substring(0, crypto.KEY_LENGTH) : key;
+			crypto.encryptKey = ByteArrayUtil.createByteArray(true, key);
 		}
 	}
 }

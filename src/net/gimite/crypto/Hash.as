@@ -1,10 +1,10 @@
-package net.gimite.util
+package net.gimite.crypto
 {
 	import flash.utils.ByteArray;
 	/**
 	 * @author Administrator
 	 */
-	public class CodeHashAdapter implements CodeHash
+	public class Hash implements IHash
 	{
 		public function hashEncode(rawText:String, hashKey:String = null):String
 		{

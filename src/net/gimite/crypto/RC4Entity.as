@@ -1,4 +1,4 @@
-package net.gimite.util
+package net.gimite.crypto
 {
 	import com.hurlant.util.Memory;
 	import com.hurlant.crypto.symmetric.IStreamCipher;

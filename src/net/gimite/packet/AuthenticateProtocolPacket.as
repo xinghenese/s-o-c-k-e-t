@@ -24,6 +24,9 @@ package net.gimite.packet
 			Logger.info('data', JSON.stringify(_data));
 			
 			if(result == SUCCESS){
+			
+//			dispose();
+			
 				if(Authentication.instance.validateSequence(_data.msqsid)){
 //					notifyJSBridge({
 //						name: 'Auth'
@@ -31,7 +34,7 @@ package net.gimite.packet
 
 					Logger.info('data.msqid', _data.msqsid);
 					
-					Connection.instance.request(ProtocolPacketManager.instance.createAuthenticateProtocolPacket({
+					Connection.instance.request(ProtocolPacketManager.instance.createPingProtocolPacket({
 						msuid: "30032005",
 						msqid: Authentication.instance.getSequenceKey()
 					}));

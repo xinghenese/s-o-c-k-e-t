@@ -42,22 +42,29 @@ package net.gimite.connection
 		{
 			var data:ByteArray = ByteArrayUtil.createByteArray(true, xml ? packet.toXMLString() : packet.toJSONString());
 			if(socket && socket.connected){
+				Logger.groupStart(packet.tagname);
+				Logger.info('Connection.request', packet.toXMLString());
 				socket.write(data);
-			}
-			else{
-							
 			}
 		}
 		
 		public function response(parsed:Object):void
 		{
 			Logger.info('Connection.reponse', JSON.stringify(parsed));
+			Logger.groupEnd();
 			var packet:ProtocolPacket = ProtocolPacketManager.instance.createProtocolPacket(parsed.name);
 			if(packet != null){
 				packet.fillData(parsed.data);
 				Logger.info('packet not null');
 				packet.process();
 			}		
+		}
+		
+		public function close():void
+		{
+			if(socket && socket.connected){
+				socket.close();
+			}
 		}
 	}
 }

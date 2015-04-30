@@ -1,14 +1,14 @@
 package net.gimite.offlineflashsocket
 {
-	import net.gimite.connection.ServerConnection;
-	import net.gimite.connection.ClientConnection;
-	import net.gimite.logger.Logger;
+	import flash.events.Event;
 	import flash.utils.ByteArray;
 	import net.gimite.connection.AbstractConnection;
+	import net.gimite.connection.ClientConnection;
+	import net.gimite.connection.ServerConnection;
+	import net.gimite.crypto.RC4Encrypt;
+	import net.gimite.logger.Logger;
 	import net.gimite.packet.HandShakeProtocolPacket;
 	import net.gimite.packet.ProtocolPacket;
-	import net.gimite.hellman.RC4Encrypt;
-	import flash.events.Event;
 	import net.gimite.snappy.SnappyFrameDecoder;
 	import net.gimite.snappy.SnappyFrameEncoder;
 	/**

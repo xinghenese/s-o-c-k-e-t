@@ -1,14 +1,14 @@
 package net.gimite.flashsocket
 {
-	import net.gimite.packet.ProtocolPacketManager;
-	import net.gimite.connection.Connection;
-	import net.gimite.hellman.RC4Encrypt;
-	import net.gimite.packet.HandShakeProtocolPacket;
 	import flash.events.Event;
 	import flash.utils.ByteArray;
-	import net.gimite.hellman.Hellman;
+	import net.gimite.connection.Connection;
+	import net.gimite.crypto.Hellman;
+	import net.gimite.crypto.RC4Encrypt;
 	import net.gimite.logger.Logger;
+	import net.gimite.packet.HandShakeProtocolPacket;
 	import net.gimite.packet.ProtocolPacket;
+	import net.gimite.packet.ProtocolPacketManager;
 	import net.gimite.snappy.SnappyFrameDecoder;
 	import net.gimite.snappy.SnappyFrameEncoder;
 	import net.gimite.util.ByteArrayUtil;
@@ -28,17 +28,17 @@ package net.gimite.flashsocket
 			super(host, port);
 		}
 		
-		override protected function handleConnect(e:Event):void
-		{
-//			var data:String = '<HSK pbk="XHBxevmo8lAe34xM87jE+3dYxfEOhnjqt/Ca2I4PZk9SorG5v+ns4dbEn2vOoUlfScFBIAht0bylxiiBq27y3Ia08aDEYqe6b/x8uuBGfRmuAc9OT4eLFeJsrmmzDzDtTIoWHPnRv9V045oIKVnRN5girx9muphhL/AVSPQ3lGA="></HSK>';
-			super.handleConnect(e);
-			if(!RC4Encrypt.ready){
-//				var pbk:String = (new Hellman()).getPublicKey();
-//				Logger.info('pbk', pbk);
-				var packet:ProtocolPacket = ProtocolPacketManager.instance.createHandShakeProtocolPacket();
-				Connection.instance.request(packet);
-			}
-		}
+//		override protected function handleConnect(e:Event):void
+//		{
+////			var data:String = '<HSK pbk="XHBxevmo8lAe34xM87jE+3dYxfEOhnjqt/Ca2I4PZk9SorG5v+ns4dbEn2vOoUlfScFBIAht0bylxiiBq27y3Ia08aDEYqe6b/x8uuBGfRmuAc9OT4eLFeJsrmmzDzDtTIoWHPnRv9V045oIKVnRN5girx9muphhL/AVSPQ3lGA="></HSK>';
+//			super.handleConnect(e);
+//			if(!RC4Encrypt.ready){
+////				var pbk:String = (new Hellman()).getPublicKey();
+////				Logger.info('pbk', pbk);
+//				var packet:ProtocolPacket = ProtocolPacketManager.instance.createHandShakeProtocolPacket();
+//				Connection.instance.request(packet);
+//			}
+//		}
 		
 		override protected function handleClose(e:Event):void
 		{

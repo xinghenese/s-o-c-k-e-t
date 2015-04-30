@@ -29,8 +29,8 @@ package net.gimite.flashsocket
 			var raw:String = data.toString();
 			var parsed:Object = null;
 			try{
-				parsed = parseJSON(raw);
-//				parsed = parseXML(raw);
+//				parsed = parseJSON(raw);
+				parsed = parseXML(raw);
 			}
 			catch(e:Error){
 				parsed = parseJSON(raw);

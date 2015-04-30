@@ -1,10 +1,10 @@
-package net.gimite.util
+package net.gimite.crypto
 {
 	import net.gimite.logger.Logger;
 	/**
 	 * @author Administrator
 	 */
-	public class RSAHash extends CodeHashAdapter
+	public class RSAHash extends Hash
 	{
 		private static var INSTANCE:RSAHash = null;
 		

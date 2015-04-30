@@ -28,7 +28,7 @@ package net.gimite.logger
 					{
 						return function(tag:String = '', msg:String = ''):void
 						{
-							ExternalInterface.call('console.' + task, '%c[' + tag + ']: %c', 
+							ExternalInterface.call('console.' + (task == 'info' ? 'log' : task), '%c[' + tag + ']: %c', 
 								'font-weight:bold;', 'word-break:break-all;', msg);
 						}
 					}									
@@ -113,6 +113,14 @@ package net.gimite.logger
 			}
 //			return result.substr(1);
 			return result;
+		}
+		
+		public static function groupStart(msg:String = ''){
+			ExternalInterface.call('console.group', msg);
+		}
+		
+		public static function groupEnd(){
+			ExternalInterface.call('console.groupEnd');
 		}
 	}
 }

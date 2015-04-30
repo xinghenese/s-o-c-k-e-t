@@ -1,13 +1,14 @@
-package net.gimite.hellman
+package net.gimite.crypto
 {
-	import net.gimite.util.Dec;
-	import com.hurlant.util.Base64;
-	import com.hurlant.crypto.prng.ARC4;
-	import net.gimite.logger.Logger;
 	import com.adobe.crypto.MD5;
-	import mx.utils.Base64Encoder;
-	import flash.utils.ByteArray;
+	import com.hurlant.crypto.prng.ARC4;
 	import com.hurlant.math.BigInteger;
+	import com.hurlant.util.Base64;
+	import flash.utils.ByteArray;
+	import mx.utils.Base64Encoder;
+	import net.gimite.hellman.KeyExchange;
+	import net.gimite.logger.Logger;
+	import net.gimite.util.Dec;
 	/**
 	 * @author Administrator
 	 */

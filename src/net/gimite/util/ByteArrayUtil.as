@@ -154,23 +154,9 @@ package net.gimite.util
 
 			while(value >= base){
 				bytes[index] = value % base;
-				
-//				Logger.info('result-' + index, bytes[index].toString(16));
-				
 				value = ~~(value / base) + (bytes[++index] || 0);
 			}
 			bytes[index] = value;
-				
-//				Logger.info('result-' + index, bytes[index].toString(16));
-			
-			
-//			if(value >= base){
-//				bytes[index+1] = ~~(value / base) + (bytes[index+1] || 0);				
-//				bytes[index] = value % base;
-//			}
-//			else{
-//				bytes[index] = value;
-//			}
 		}
 		
 		public static function getSignificantLength(bytes:ByteArray):int
@@ -215,8 +201,8 @@ package net.gimite.util
 //			if(bytes.endian == Endian.BIG_ENDIAN){
 				while(bytes.bytesAvailable)
 				{
-					result = result + bytes.readUnsignedByte().toString(radius) + ", ";
-//					result = result + bytes.readByte().toString(radius) + ", ";
+//					result = result + bytes.readUnsignedByte().toString(radius) + ", ";
+					result = result + bytes.readByte().toString(radius) + ", ";
 				}
 //			}
 //			else{

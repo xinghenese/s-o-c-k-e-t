@@ -1,9 +1,9 @@
 package net.gimite.offlineflashsocket
 {
-	import net.gimite.connection.AbstractConnection;
-	import net.gimite.hellman.RC4Encrypt;
-	import net.gimite.logger.Logger;
 	import flash.utils.ByteArray;
+	import net.gimite.connection.AbstractConnection;
+	import net.gimite.crypto.RC4Encrypt;
+	import net.gimite.logger.Logger;
 	/**
 	 * @author Administrator
 	 */

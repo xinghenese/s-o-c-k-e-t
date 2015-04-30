@@ -1,23 +1,18 @@
-package net.gimite.hellman
+package net.gimite.crypto
 {
-	import net.gimite.util.RC4Entity;
+	import flash.utils.ByteArray;
 	import net.gimite.logger.Logger;
 	import net.gimite.util.ByteArrayUtil;
-	import flash.utils.ByteArray;
 	/**
 	 * @author Reco
 	 */
-	public class RC4Encrypt
+	public class RC4Encrypt extends Crypto
 	{
 		private static var _instance:RC4Encrypt = null;
-		private static var _ready:Boolean = false;
 		private static var _enable:Boolean = true;
 		
-		public static const KEY_LENGTH:uint = 32;
-		
-		private var _rc4:RC4Entity = null;
-		private var _hellman:KeyExchange = null;
-		private var _key:ByteArray = null;
+		private var _rc4:RC4Entity;
+		private var _ready:Boolean = false;
 		
 		public function RC4Encrypt(enforcer:SingletonEnforcer)
 		{
@@ -32,11 +27,6 @@ package net.gimite.hellman
 			return _instance;
 		}
 		
-		public static function get ready():Boolean
-		{
-			return _enable && _ready;
-		}
-		
 		public static function get enable():Boolean
 		{
 			return _enable;
@@ -47,16 +37,26 @@ package net.gimite.hellman
 			_enable = enable;
 		}
 		
-//		public function generateKeyPair():KeyExchange
-//		{
-//			return new Hellman();
-//		}
-		
-		public function set encryptkey(key:String):void
+		override public function set encryptKey(key:ByteArray):void
 		{
-			_key = ByteArrayUtil.createByteArray(true, key);
-			_rc4 = new RC4Entity(_key);
+			super.encryptKey = key;
+			_rc4 = new RC4Entity(key);
 			_ready = true;
+		}
+		
+		override public function get ready():Boolean
+		{
+			return _ready;
+		}
+		
+		override public function encrypt(rawBytes:ByteArray, key:ByteArray = null):ByteArray
+		{
+			return RC4(rawBytes);
+		}
+		
+		override public function decrypt(rawBytes:ByteArray, key:ByteArray = null):ByteArray
+		{
+			return RC4(rawBytes);
 		}
 		
 		public function RC4(bytes:ByteArray):ByteArray
@@ -69,8 +69,5 @@ package net.gimite.hellman
 	}
 }
 
-class SingletonEnforcer
-{
-	
-}
+class SingletonEnforcer{}
 
