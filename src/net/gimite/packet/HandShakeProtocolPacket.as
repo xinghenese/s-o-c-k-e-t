@@ -1,5 +1,7 @@
 package net.gimite.packet
 {
+	import net.gimite.bridge.ActionScriptInterface;
+	import net.gimite.profiles.UserProfiles;
 	import net.gimite.bridge.ScriptBridge;
 	import com.hurlant.util.Base64;
 	import flash.utils.ByteArray;
@@ -17,6 +19,7 @@ package net.gimite.packet
 	{
 		private var keyExchange:KeyExchange;
 		private var crypto:Crypto;
+		private var bridge:ScriptBridge = ScriptBridge.instance;
 		
 		public function HandShakeProtocolPacket(data:* = null)
 		{
@@ -35,24 +38,16 @@ package net.gimite.packet
 		{
 			var pbk:String = getData('pbk');
 			var pbkBytes:ByteArray = Base64.decodeToByteArray(pbk);
-			var key:String = keyExchange.getEncryptKey(pbkBytes);
-			encryptKey = key;
-			ScriptBridge.instance.exposeToJS('encrypt', crypto.encrypt);
-			ScriptBridge.instance.exposeToJS('decrypt', crypto.decrypt);
+			encryptKey = keyExchange.getEncryptKey(pbkBytes);
+			bridge.exposeToJS(ActionScriptInterface.ENCRYPT, crypto.encrypt);
+			bridge.exposeToJS(ActionScriptInterface.DECRYPT, crypto.decrypt);
 		}
 		
 		private function sendInitPacket():void
 		{
 			Logger.log('sendInitPacket');
-			var packet:ProtocolPacket = ProtocolPacketManager.instance.createAuthenticateProtocolPacket({
-				msuid: "30032005",
-				zip: "1",
-				v: "1.0",
-				ver: "4.1",
-				dev: "1",
-				token: "DXIBNW4Z_llL-lfbLUv51PS39jrO1ihZ51xxskjsxsenPk4XQpo5Djs55i2utFHC-DNiC7XwVss0OjMe19BF6xTz7SqiaJv3TENs4GFS_kkjFQYojUUps8qbZ4o-Yd6EJUqMWMf6BZcodrqL1EQP__JmCQJFq3DqNjPNS4OdxTs", 
-				devn: "Sony Xperia Z - 4.2.2 - API 17 - 1080x1920_b0c56658-4c96-419d-aaba-68cc2ceb750d"
-			});
+			var packet:ProtocolPacket = ProtocolPacketManager.instance
+				.createAuthenticateProtocolPacket(UserProfiles.instance.profile);
 			Connection.instance.request(packet);
 		}
 		

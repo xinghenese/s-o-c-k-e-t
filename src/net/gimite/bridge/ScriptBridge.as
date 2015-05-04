@@ -1,5 +1,6 @@
 package net.gimite.bridge
 {
+	import flash.utils.describeType;
 	import flash.events.Event;
 	import net.gimite.packet.ProtocolEvent;
 	import flash.external.ExternalInterface;
@@ -27,12 +28,22 @@ package net.gimite.bridge
 		
 		public function exposeToJS(name:String, callback:Function):void
 		{
-			ExternalInterface.addCallback(name, callback);
+			//confirm whether the api defines in ActionScriptInterface
+			if(describeType(ActionScriptInterface).constant.(@name == name).length() > 0){
+				ExternalInterface.addCallback(name, callback);
+			}			
+		}
+		
+		public function requireJS(name:String):Function
+		{
+			return function(... args):*{
+				return ExternalInterface.call(name, args);
+			};
 		}
 		
 		public function notifyJS(event:Event):void
 		{
-			ExternalInterface.call('protocol', (event as ProtocolEvent).message);
+			ExternalInterface.call(JavaScriptInterface.PROTOCOL, (event as ProtocolEvent).message);
 		}
 		
 		public function scriptError(event:Event):void

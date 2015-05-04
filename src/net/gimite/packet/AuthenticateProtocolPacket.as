@@ -1,5 +1,6 @@
 package net.gimite.packet
 {
+	import net.gimite.profiles.UserProfiles;
 	import net.gimite.logger.Logger;
 	import net.gimite.connection.Connection;
 	import net.gimite.bridge.ScriptBridge;
@@ -35,7 +36,7 @@ package net.gimite.packet
 					Logger.info('data.msqid', _data.msqsid);
 					
 					Connection.instance.request(ProtocolPacketManager.instance.createPingProtocolPacket({
-						msuid: "30032005",
+						msuid: UserProfiles.instance.userId,
 						msqid: Authentication.instance.getSequenceKey()
 					}));
 					

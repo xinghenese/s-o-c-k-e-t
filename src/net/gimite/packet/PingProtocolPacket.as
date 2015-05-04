@@ -1,5 +1,6 @@
 package net.gimite.packet
 {
+	import net.gimite.profiles.UserProfiles;
 	import net.gimite.logger.Logger;
 	import net.gimite.connection.Connection;
 	/**
@@ -27,7 +28,7 @@ package net.gimite.packet
 			var packet:ProtocolPacket = ProtocolPacketManager.instance.createPingProtocolPacket();
 			if(packet != null){
 				packet.fillData({
-					msuid: "30032005",
+					msuid: UserProfiles.instance.userId,
 					msqid: Authentication.instance.getSequenceKey()
 				});
 				Logger.info('the ' + currenttime + ' time to send PingPacket');
