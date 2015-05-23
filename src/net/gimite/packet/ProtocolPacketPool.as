@@ -1,5 +1,7 @@
 package net.gimite.packet
 {
+	import flash.utils.clearTimeout;
+	import flash.utils.setTimeout;
 	import net.gimite.logger.Logger;
 	import flash.utils.getDefinitionByName;
 	/**
@@ -8,11 +10,12 @@ package net.gimite.packet
 	public class ProtocolPacketPool
 	{
 		private static var INSTANCE:ProtocolPacketPool = null;	
-		private var _packets:Vector.<ProtocolPacket>;
+		private var packets:Vector.<ProtocolPacket>;
+		private var timers:Object = {};
 		
 		public function ProtocolPacketPool(enforcer:SingletonEnforcer)
 		{
-			_packets = new Vector.<ProtocolPacket>();
+			packets = new Vector.<ProtocolPacket>();
 		}
 		
 		public static function get instance():ProtocolPacketPool
@@ -30,10 +33,11 @@ package net.gimite.packet
 		 */
 		public function removePacket(packet:ProtocolPacket):void
 		{
-			var index:int = _packets.indexOf(packet);
+			var index:int = packets.indexOf(packet);
 			if(index != -1){
-				_packets.splice(index, 1);
+				packets.splice(index, 1);
 			}
+			Logger.info('removePacket', packets);
 		}
 		
 		/**
@@ -48,14 +52,31 @@ package net.gimite.packet
 				var packet:ProtocolPacket = findPacket(clzName);
 				if(packet != null){
 					//remove the one-off packet from the packets pool
-					if(!SocketProtocolInfo.isReusable(clzName)){
+//					if(!SocketProtocolInfo.isReusable(clzName)){
+//						removePacket(packet);
+//					}
+					var delay:int = SocketProtocolInfo.getTimeout(clzName);
+					//remove the one-off packet from the packets pool with no delay.
+					if(delay == 0){
 						removePacket(packet);
+					}
+					//delay removing the packet.
+					else if(delay > 0){
+						var timer:uint = timers[clzName] || 0;
+						//if there is already a timer to delay removing the packet, reset the timer,
+						//which helps avoid duplicate and ineffective removals.
+						if(timer > 0){
+							clearTimeout(timer);
+						}
+						timers[clzName] = setTimeout(function():void{
+							removePacket(packet);
+						}, delay);
 					}
 					return packet.reset().fillData(data);
 				}
 				var clazz:Class = getDefinitionByName(clzName) as Class;
 				packet = new clazz(data);
-				_packets.push(packet);
+				packets.push(packet);
 				return packet;
 			}
 			catch(e:Error){
@@ -77,15 +98,15 @@ package net.gimite.packet
 		private function findPacket(clzName:String):ProtocolPacket
 		{
 			var clazz:Class = getDefinitionByName(clzName) as Class; //maybe throw ReferenceError
-			var length:uint = _packets.length;
-			Logger.info('packets', _packets);
+			var length:uint = packets.length;
+			Logger.info('packets', packets);
 			
 			if(length == 0){
 				return null;
 			}	
 			for(var i:uint = 0; i < length; i ++){
-				if(_packets[i] is clazz){
-					return _packets[i];
+				if(packets[i] is clazz){
+					return packets[i];
 				}
 			}
 			

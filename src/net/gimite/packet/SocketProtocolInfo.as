@@ -26,6 +26,11 @@ package net.gimite.packet
 			PingProtocolPacket: true
 		}
 		
+		private static var timeout:Object = {
+			PingProtocolPacket: 1000,
+			SwitchStatusProtocolPacket: 1000
+		}
+		
 		//used to check whether the <i>SocketProtocolInfo::tagNames</i> has been initialized.
 		private static var initialized:Boolean = false;
 		
@@ -81,6 +86,12 @@ package net.gimite.packet
 		{
 			var clzName:String = getClassName(clazz);
 			return reusable[clzName];
+		}
+		
+		public static function getTimeout(clazz:*):int
+		{
+			var clzName:String = getClassName(clazz);
+			return timeout[clzName] || 0;
 		}
 		
 		/**
